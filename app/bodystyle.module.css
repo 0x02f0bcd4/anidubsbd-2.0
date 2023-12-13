@@ -1,0 +1,16 @@
+@font-face {
+    font-family: "BanglaFont";
+    src: url("/BanglaFont.ttf");
+}
+
+@font-face {
+    font-family: "EnglishFont-Roboto";
+    src: url("/EnglishFont.ttf");
+}
+
+
+.body{
+    font-family: "BanglaFont", "EnglishFont-Roboto";
+    background-color: #222;
+    color: whitesmoke;
+}

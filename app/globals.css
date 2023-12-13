@@ -1,0 +1,10 @@
+@font-face {
+    font-family: "BanglaFont";
+    src: url("/../public/BanglaFont.ttf");
+}
+
+
+body{
+    font-family: "BanglaFont";
+    color: whitesmoke;
+}
