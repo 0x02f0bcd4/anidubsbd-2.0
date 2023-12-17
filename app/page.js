@@ -8,6 +8,7 @@ import Search from "@/components/search/search";
 import hamburger from "../public/bars.svg";
 import { useEffect, useState } from "react";
 import Login from "@/components/Login";
+import { getSession } from "next-auth/react";
 
 function LoadTabs({type}){
 	const [tabContents,setTabContents] = useState({empty: true});
@@ -57,7 +58,6 @@ function LoadTabs({type}){
 
 function Page() {
   const [showHamburger,setShowHamburger] = useState(false);
-  console.log("hamburger is being show: ",showHamburger);
   return (
     <>
     	<header className={styles.headerHome}>

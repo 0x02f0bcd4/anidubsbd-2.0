@@ -1,12 +1,15 @@
 import { redirect } from "next/navigation";
 import styles from "./animeInfo.module.css";
 import HeaderClient from "@/components/search/header_client";
-
+import { getServerSession } from "next-auth";
+import { options } from "../api/auth/[...nextauth]/option";
 async function AnimeInfo({searchParams}){
+    //get the session id, if avaiable
+    const session = await getServerSession(options); 
     if(searchParams.id){
         const response = await fetch(`http://127.0.0.1:3000/api/db_ap?param=info&id=${searchParams.id}`,{
             next:{
-                revalidate: 10
+                revalidate: 0
             }
         });
         const json = await response.json();
@@ -27,7 +30,7 @@ async function AnimeInfo({searchParams}){
                 <div className={styles.infoBox}>
                     <div className={styles.poster_and_play}>
                         <img src = {`/Posters/${fullname} Poster.jpg`} alt="Poster"/>
-                        <a href="" className={styles.watchButton}><button value={`Watch ${json.values.anime_type}`} >Watch {json.values.anime_type}</button></a>
+                        <a href={`/watchPage?animeID=${json.values.id}`}className={styles.watchButton}><button value={`Watch ${json.values.anime_type}`} >Watch {json.values.anime_type}</button></a>
                     </div>
                     <div className={styles.descriptions}>
 						<div className={styles.general_description}>

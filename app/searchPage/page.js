@@ -21,7 +21,6 @@ export default async function SearchPage({searchParams}){
     }});
     const json = await result.json();
     
-    console.log("the json is: ",json);
     //the parameter exists, let's fetch the data
     return (
         <>

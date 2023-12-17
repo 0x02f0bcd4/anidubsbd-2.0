@@ -29,8 +29,6 @@ function Search({onLowerDevice}) {
         }
     },[formField]);
 
-    console.log("the search Results are: ",searchResults);
-    console.log("formField is: ",formField);
     const handleChange = (event)=>{
         setFormField(event.target.value);
     };

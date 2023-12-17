@@ -4,7 +4,6 @@ import { useSession } from "next-auth/react";
 
 export default function Login(){
     const session = useSession();
-    console.log("the session is: ",session);
     if(session && session.status === 'authenticated'){
         //if the session exists
         //then, we show the dashboard

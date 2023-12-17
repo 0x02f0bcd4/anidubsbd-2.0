@@ -1,16 +1,7 @@
-@font-face {
-    font-family: "BanglaFont";
-    src: url("/BanglaFont.ttf");
-}
-
-@font-face {
-    font-family: "EnglishFont-Roboto";
-    src: url("/EnglishFont.ttf");
-}
-
-
+@import url('https://fonts.googleapis.com/css2?family=Tiro+Bangla&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali&family=Tiro+Bangla&display=swap');
 .body{
-    font-family: "BanglaFont", "EnglishFont-Roboto";
+    font-family: "Tiro Bangla", "Noto Sans Bengali";
     background-color: #222;
     color: whitesmoke;
 }

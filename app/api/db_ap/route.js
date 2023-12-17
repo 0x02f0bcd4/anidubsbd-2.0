@@ -13,65 +13,233 @@ const database = mysql({
 
 database.connect();
 
+async function doesTableExists(schema_name, table_name){
+    //if the table exists, return true, else false
+    let sql = 'SELECT * FROM `information_schema`.`tables` WHERE `table_schema` = '  + database.escape(schema_name) + ' AND `table_name` = ' + database.escape(table_name);
+    let query_result = await database.query(sql);
+    return Boolean(query_result[0]);
+}
+
+export async function ServerSideRequests_anime(requestType, requestParam){
+    let response = {status: 0, statusText: ''};
+    switch(requestType){
+        case 'incrementViewCounter':{
+            let sql = `UPDATE \`anime_table\` SET \`anime_totalview\` = \`anime_totalview\` +1 WHERE \`id\`  = ${requestParam.id}`;
+            database.query(sql);
+            response.status = 200;
+            response.statusText = "OK";
+            break;
+        }
+        case 'verifyAnime':{
+            response.values = {};
+            let sql = 'SELECT `id`, `anime_name`, `anime_season` FROM `anidubsbd`.`anime_table` WHERE `id`= ' +database.escape(requestParam.animeID);
+            let query_result = await database.query(sql);
+            response.values = {...query_result[0]};
+            if(response.values.exists = Boolean(query_result[0])){
+                //the anime exists, get the animeID with related genre
+                sql = 'SELECT `genre_id` FROM `anime_genre` WHERE `anime_id` = ' + requestParam.animeID;
+                query_result = await database.query(sql);
+                //make the genre array
+                let genre_ids = (query_result.map((value)=>value.genre_id)).join();
+                sql = 'SELECT `id`,`anime_name`,`anime_season` FROM `anidubsbd`.`anime_table` WHERE `id` IN (SELECT `anime_id` FROM `anidubsbd`.`anime_genre` WHERE `genre_id` IN (' + genre_ids + ')) ORDER BY `priority`,`anime_totalview` DESC LIMIT 6';
+                query_result = await Promise.all([doQueryByField(`anime_${requestParam.animeID}_watchdetails`,['*']),database.query(sql)]);
+                response.values.episode_list = query_result[0];
+                response.values.see_more = query_result[1];
+            } 
+            break;
+        }
+        case 'verifyAnimeAndEpisode':{
+            response.status = 404;
+            response.statusText = 'not found';
+            if((await doesTableExists('anidubsbd',`anime_${requestParam.animeID}_watchdetails`))){
+                //the table exists now check if the episode exists
+                let sql = `SELECT \`id\` FROM \`anime_${requestParam.animeID}_watchdetails\` WHERE \`id\` = ${requestParam.episodeID}`;
+                const query_result = await database.query(sql);
+                if(query_result[0]){
+                    //alright, everything exists, prepare for an insertion
+                    response.status = 200;
+                    response.statusText = 'found';
+                }
+                
+            }
+            
+            break;
+        }
+        case 'insertComment':{
+            let sql = 'INSERT INTO `anime_comments` (`anime_id`,`episode_id`,`user_id`,`comment`) VALUES ?';
+            let values = [[requestParam.animeID, requestParam.episodeID, requestParam.userID, requestParam.comment]];
+            let query_result = await database.query(sql, [values]);
+            console.log("the comment insertion query_result was: ", query_result);
+            response.status = 200;
+            response.statusText = 'OK';
+            break;
+        }
+    }
+    await database.end();
+    return response;
+}
+
 //sanitize SQL queries with LIKE keyword
 function sanitizeLIKE(value){
     let percentage_escaped = value.replace(/\%/g,'\\%');
     return percentage_escaped.replace(/\"/g,'\"');
 }
 
-async function doQueryByField(table_name,columns,fields,short){
+
+//this helper function takes an object which contains name and order field, and return a string 
+//looks like '`name` order' to be used for ORDER field in SQL query
+function orderToString(obj){
+    return ` \`${obj.name}\` ${obj.order} `;
+}
+
+async function doQueryByField(table_name,columns,fields,short,order_list){
     //if the short is not 0, then do a LIMIT in SELECT
     //if the columns contain *, then, don't do the mapping
+    let order_sql = '';
     if(!columns.find((value)=> value === '*')){
         columns = columns.map((value)=>{
             return `\`${value}\``;
         });
     }
+    if(order_list){
+        //make the SQL statement
+        order_sql = ' ORDER BY' + ((order_list.map((value)=>{return orderToString(value)})).join());
+    } 
 
-
-    let sql = `SELECT ${columns.join()} FROM \`${table_name}\`` + (fields?`WHERE \`${fields.name}\` = '${fields.value}' `:"") + (short && short!==0?"" : `LIMIT ${short}`);
+    let sql = `SELECT ${columns.join()} FROM \`${table_name}\`` + (fields?` WHERE \`${fields.name}\` = '${fields.value}' `:"")  + order_sql + (Boolean(short)? ` LIMIT ${short}`: "") ;
     
     let query_result = await database.query(sql);
-    console.log("the query_result for doQuery is: ",query_result);
     return query_result;
 }
 
-async function doQueryLikeField(table_name,columns,field, short){
+async function doQueryLikeField(table_name,columns,field, short,order_list){
     //if the short is not 0, then do a LIMIT in SELECT
     //if the columns contain *, then, don't do the mapping
+    let order_sql = '';
     if(!columns.find((value)=> value === '*')){
         columns = columns.map((value)=>{
             return `\`${value}\``;
         });
     }
+
+    if(order_list){
+        //make the SQL statement
+        order_sql = ' ORDER BY' + ((order_list.map((value)=>{return orderToString(value)})).join());
+    }
     let sql = `SELECT ${columns.join()} FROM \`${table_name}\`` + (field && field.name && field.value? 
-        ` WHERE \`${field.name}\` LIKE '%` + sanitizeLIKE(field.value) + "%'": "") + (short && short!==0?` LIMIT ${short}`: "");
+        ` WHERE \`${field.name}\` LIKE '%` + sanitizeLIKE(field.value) + "%'": "") + order_sql +(short && short!==0?` LIMIT ${short}`: "");
     let query_result = await database.query(sql);
-    console.log("the result from doQueryLikeField: ", query_result);
     return query_result;
+}
+
+
+//get all the information regarding an anime
+async function getInfos(id){
+    //first, get the general informations
+    let sql = `SELECT \`anime_table\`.*, \`genre_id\` FROM \`anime_table\` INNER JOIN \`anime_genre\` ON \`anime_id\` = ${id} WHERE \`id\` = ${id}`;
+    let query_result = await database.query(sql);
+    if(query_result[0]){
+    let returnStruct = {values:{
+        ...query_result[0]
+    }};
+
+    let genre_ids = (query_result.map((value)=>{
+        return value.genre_id;
+    })).join();
+    //now, get all the genre_name
+    sql = 'SELECT `genre_name` FROM `genre_table` WHERE `id` IN (' + genre_ids + ')';
+    query_result = await database.query(sql);
+
+    returnStruct.values.anime_genres = query_result.map(value=>value.genre_name);
+    //get the anime name
+    sql = 'SELECT `id`,`anime_name`,`anime_season` FROM `anidubsbd`.`anime_table` WHERE `id` IN (SELECT `anime_id` FROM `anidubsbd`.`anime_genre` WHERE `genre_id` IN (' + genre_ids + ')) ORDER BY `priority`,`anime_totalview` DESC LIMIT 6';
+    query_result = await database.query(sql);
+    returnStruct.see_more = query_result;
+    returnStruct.values.genre_id = null; 
+    
+    return returnStruct;
+}
+
+
+    return null;
 }
 
 export async function GET(req,res){
     const url = new URL(req.url);
-    console.log("the params are: ",url.searchParams);
-    console.log("the result of url.searchParams.get('param') is: ",url.searchParams.get('param'));
-    const resultJSON = { values: {}};
-    let query_result = await doQueryByField('anime_table',['id','anime_name','anime_season'],{name: 'anime_name', value: 'Spy X Family'},2);
-    console.log("the query_result that was returned is: ",query_result);
-    const response = new Response(JSON.stringify(resultJSON));
+    let response = new Response('',{status: 200, statusText: "Not found, make sure you entered correct parameter names and values"});
+    let resultJSON = { values: {}};
 
-    if(url.searchParams.get('param')){
+
+    if(url.searchParams.get('param'))
+    {
         switch(url.searchParams.get('param')){
             case 'search':{
                 //if the searchParams have the HTTPS query: name, then do a query, else, dont
                 if(url.searchParams.get('name')){
-                  console.log("The name param exists: ",url.searchParams.get('name'));
-                  query_result = await doQueryLikeField('anime_table',['id','anime_name','anime_season'],{name: 'anime_name', value: url.searchParams.get('name')},2);
-                  console.log("The query_result is(like): ", query_result);
+                  let short = parseInt(url.searchParams.get('short')); 
+                  let query_result = await doQueryLikeField('anime_table',['id','anime_name','anime_season'],{name: 'anime_name', value: url.searchParams.get('name')},short,[{name: 'priority', order: 'ASC'},{name: 'anime_totalview', order: 'DESC'}]);
+                  resultJSON.values = query_result;
+                  response = new Response(JSON.stringify(resultJSON));
                 }
+                break;
             }
+
+            case 'info':{
+                if(url.searchParams.get('id')){
+                    //try to get the id;
+                    const id = parseInt(url.searchParams.get('id'));
+                    //get all the information about the anime in question
+                    if(id)
+                    {
+                        resultJSON = await getInfos(id);
+                        if(resultJSON)
+                        {
+                            response = new Response(JSON.stringify(resultJSON));
+                        }
+                    }
+               }
+               break;
+            }
+
+            case 'trending':
+            case 'bsub':
+            case 'bdub':
+            case 'edub':
+            {
+                const param = url.searchParams.get('param');
+                if(param ==='trending'){
+                    //if it's the nigga in the hood, don't send any other nigga
+                    resultJSON.values = await doQueryByField('anime_table',['id','anime_name','anime_season'],null,6);
+                }
+                else{
+                    resultJSON.values = await doQueryByField('anime_table',['id','anime_name','anime_season'],{name: 'anime_type', value: param},6);
+                }
+                
+                response = new Response(JSON.stringify(resultJSON));
+                break;
+            }
+            case 'comments':{
+                const animeID = parseInt(url.searchParams.get('animeID'));
+                const episodeID = parseInt(url.searchParams.get('episodeID'));
+                if(animeID && episodeID){
+                    /*let sql = `SELECT \`name\`,\`comment\` FROM \`anidubsbd\`.\`anime_${animeID}_comments\` INNER JOIN `+ 
+                    ` \`users\`.\`users\` ON \`anidubsbd\`.\`anime_${animeID}_comments\`.\`user_id\` = \`users\`.\`users\`.\`id\` `+ 
+                    ` WHERE \`anidubsbd\`.\`anime_${animeID}_comments\`.\`anime_episode\` = ${episodeID}`;*/
+                    let sql = `SELECT \`username\`,\`comment\` FROM \`anidubsbd\`.\`anime_comments\` INNER JOIN \`users\`.\`users\` ON `+
+                    `\`anidubsbd\`.\`anime_comments\`.\`user_id\` = \`users\`.\`users\`.\`id\` WHERE` + 
+                    ` \`anidubsbd\`.\`anime_comments\`.\`anime_id\` = ${animeID} AND` +
+                    ` \`anidubsbd\`.\`anime_comments\`.\`episode_id\` = ${episodeID}`;
+                    resultJSON.values = await database.query(sql);
+                    console.log("the resultJSON is: ", resultJSON.values);
+                    response = new Response(JSON.stringify(resultJSON)); 
+                }
+                else{
+                    response = new Response("Bad request, the request doesn't contain necessary parameters, or the values isn't correct", {status: 400, statusText: "Bad request"});
+                }
+                break;
+            } 
         }
     }
-
+    database.end();
     return response;
 }
