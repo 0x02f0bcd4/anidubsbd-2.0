@@ -1,8 +1,10 @@
 'use client';
 
+import HeaderClient from "@/components/search/header_client";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useEffect,  useRef,  useState } from "react";
+import styles from './watchPage.module.css';
 
 
 function fetchComments(animeID,episodeID, setter){
@@ -54,8 +56,7 @@ function LoadComment({animeID,episodeID})
     },[episodeID]);
 
     const handleCommentSubmit = (event)=>{
-        console.log("during event handling, the episodeID is: ", episodeID);
-        event.preventDefault(); 
+        event.preventDefault();
         PostComment(userSession.data.user.userID,animeID,commentRef.current.getAttribute('episode-number'),commentRef.current.value,setComments);
         commentRef.current.value = '';
     };
@@ -65,11 +66,13 @@ function LoadComment({animeID,episodeID})
             //the user isn't logged in
             setPostCommentJSX((<h2><a href='/api/auth/signin' style={{textDecoration:"none", color: 'orange'}}>Login</a> to post comment</h2>));
         }
-        else if(userSession.status === 'authenticated'){
-            setPostCommentJSX((<form action="/api/user_DBAP" method='post' onSubmit={handleCommentSubmit}>
-                <label htmlFor="comment">Insert your comment here</label>
-                <input type="text" minLength={2} maxLength={2000} autoComplete="off" episode-number={episodeID} ref={commentRef}/>
-            </form>));
+        else if(userSession.status === 'authenticated'){ 
+            setPostCommentJSX((
+                    <form className={styles.commentbox} onSubmit={handleCommentSubmit}>
+                        <textarea minLength={2} maxLength={2000} autoComplete="off" episode-number={episodeID} placeholder="Insert your comment" ref={commentRef}/>
+                        <button onClick={handleCommentSubmit}>POST!</button>
+                    </form>
+            ));
         }
     },[episodeID,userSession]);
 
@@ -93,17 +96,23 @@ function LoadComment({animeID,episodeID})
 
     return (
         <>
-            <div>
-                <h2>The comments are -</h2>
+            <div className={styles.comment_section}>
+                <h2>মন্তব্য</h2>
+                <div className={styles.postedcomment}>
                 {
                     comments.comments.map((value,index)=>{
                         return (
-                            <h3 key={index}>{value.username} -&gt; {value.comment}</h3>
+                            <div key={index} className={styles.comment}>
+                                <h3>{value.username}</h3>
+                                <h4>{value.comment}</h4>
+                            </div>
                         );
                     })
-                }
-            {postCommentJSX}
-            
+                } 
+                </div>
+                <div className={styles.postcomment}>
+                    {postCommentJSX}
+                </div>
             </div>
         </>
     ); 
@@ -168,12 +177,72 @@ export default function Page(){
         );
     }
     
+    console.log("the episodeList is: ", episodeList);
     //if it was none of the cases, then it means that fetching is done and the data is already here
     const handleEpisodeChange = (event)=>{
         const newEpisode = event.target.getAttribute('episode-number');
         setCurrentEpisode(parseInt(newEpisode));
-    }
-    return(
+    };
+
+    const handlePreventingRedirecing = (event)=>{
+        event.preventDefault();
+    };
+
+    let animeName = episodeList.values.anime_name + (episodeList.values.anime_season?' '+episodeList.values.anime_season: '');
+    return (
+        <>
+            <HeaderClient/>
+            
+            <p className={styles.anime_title}><span className={styles.watching}>আপনি দেখছেন </span><span className={styles.anime_ep_name}>{animeName}</span></p>
+            <p className={styles.episode_title}><span className={styles.watching}>পর্ব </span><span className={styles.anime_ep_name}>{episodeList.values.episode_list[currentEpisode].episode_name}</span></p>
+            <div className={styles.ViewPort}>
+                <iframe src={episodeList.values.episode_list[currentEpisode].episode_url} allowFullScreen="allowfullscreen">
+
+                </iframe>
+                <ol className={styles.viewpage_episode_list}>
+                    {
+                        episodeList.values.episode_list.map((value,index)=>{ 
+
+                            return (
+                                <li className={styles.viewpage_episode_list_item} key={index} onClick={handleEpisodeChange} episode-number={index}>
+                                    <a href={value.episode_url} onClick={handlePreventingRedirecing}><p>{index+1} . {value.episode_name}</p></a>
+                                </li>
+                            )
+                        })
+                    }
+                </ol>
+            </div>
+
+            <LoadComment animeID={animeID} episodeID={currentEpisode+1}/>
+            <div className={styles.see_more_tab}>
+                    <div className={styles.title}>
+                        <h3>Even more</h3>
+                    </div>
+                    <div className={styles.cards}>
+                        <div className={styles.items}>
+                           {
+                                episodeList.values.see_more.map((value,index)=>{
+                                    let fullname = value.anime_name + (value.anime_season?" "+value.anime_season:"");
+                                    console.log('the value.id: ', value.id);
+                                    console.log("episodeList.values.id: ", episodeList.values.id);
+                                    if(value.id !== episodeList.values.id){
+
+                                        return (
+                                            <a href={`/animeInfo?id=${value.id}`} key={index} className={styles.item_div}>
+                                                <img src={`/Posters/${fullname} Poster.jpg`} alt={`Poster of ${fullname}`}/>
+                                                <span>{fullname}</span>
+                                            </a>
+                                        );
+                                    }
+                                })
+                           } 
+                        </div>
+                    </div>
+		    </div>
+
+        </>
+    );
+    /*return(
         <>
             <div>
                 <iframe src={episodeList.values.episode_list[currentEpisode].episode_url}/>
@@ -189,5 +258,5 @@ export default function Page(){
             </div>
             <LoadComment animeID={animeID} episodeID={currentEpisode+1}/>
         </>
-    );
+    );*/
 }

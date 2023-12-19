@@ -1,5 +1,5 @@
 import mysql from 'serverless-mysql';
-
+import {writeFile} from 'fs/promises';
 const database = mysql({
     config: {
         host: '127.0.0.1',
@@ -20,9 +20,163 @@ async function doesTableExists(schema_name, table_name){
     return Boolean(query_result[0]);
 }
 
+
+//sanitize SQL queries with LIKE keyword
+function sanitizeLIKE(value){
+    let percentage_escaped = value.replace(/\%/g,'\\%');
+    return percentage_escaped.replace(/\"/g,'\"');
+}
+
+
+//this helper function takes an object which contains name and order field, and return a string 
+//looks like '`name` order' to be used for ORDER field in SQL query
+function orderToString(obj){
+    return ` \`${obj.name}\` ${obj.order} `;
+}
+
+async function doQueryByField(table_name,columns,fields,short,order_list){
+    //if the short is not 0, then do a LIMIT in SELECT
+    //if the columns contain *, then, don't do the mapping
+    let order_sql = '';
+    if(!columns.find((value)=> value === '*')){
+        columns = columns.map((value)=>{
+            return `\`${value}\``;
+        });
+    }
+    if(order_list){
+        //make the SQL statement
+        order_sql = ' ORDER BY' + ((order_list.map((value)=>{return orderToString(value)})).join());
+    } 
+
+    let sql = `SELECT ${columns.join()} FROM \`${table_name}\`` + (fields?` WHERE \`${fields.name}\` = '${fields.value}' `:"")  + order_sql + (Boolean(short)? ` LIMIT ${short}`: "") ;
+    
+    let query_result = await database.query(sql);
+    return query_result;
+}
+
+async function doQueryLikeField(table_name,columns,field, short,order_list){
+    //if the short is not 0, then do a LIMIT in SELECT
+    //if the columns contain *, then, don't do the mapping
+    let order_sql = '';
+    if(!columns.find((value)=> value === '*')){
+        columns = columns.map((value)=>{
+            return `\`${value}\``;
+        });
+    }
+
+    if(order_list){
+        //make the SQL statement
+        order_sql = ' ORDER BY' + ((order_list.map((value)=>{return orderToString(value)})).join());
+    }
+    let sql = `SELECT ${columns.join()} FROM \`${table_name}\`` + (field && field.name && field.value? 
+        ` WHERE \`${field.name}\` LIKE '%` + sanitizeLIKE(field.value) + "%'": "") + order_sql +(short && short!==0?` LIMIT ${short}`: "");
+    let query_result = await database.query(sql);
+    return query_result;
+}
+
+
+
+//get all the information about the anime
+async function getInfos(id){
+    //first, get the general informations
+    let sql = `SELECT \`anime_table\`.*, \`genre_id\` FROM \`anime_table\` INNER JOIN \`anime_genre\` ON \`anime_id\` = ${id} WHERE \`id\` = ${id}`;
+    let query_result = await database.query(sql);
+    if(query_result[0]){
+    	let returnStruct = {values:{
+        	...query_result[0]
+    	}};
+	
+    	let genre_ids = (query_result.map((value)=>{
+        	return value.genre_id;
+    	})).join();
+    	//now, get all the genre_name
+    	sql = 'SELECT `genre_name` FROM `genre_table` WHERE `id` IN (' + genre_ids + ')';
+    	query_result = await database.query(sql);
+	
+    	returnStruct.values.anime_genres = query_result.map(value=>value.genre_name);
+    	//get the anime name
+    	sql = 'SELECT `id`,`anime_name`,`anime_season` FROM `anidubsbd`.`anime_table` WHERE `id` IN (SELECT `anime_id` FROM `anidubsbd`.`anime_genre` WHERE `genre_id` IN (' + genre_ids + ')) ORDER BY `priority`,`anime_totalview` DESC LIMIT 6';
+    	query_result = await database.query(sql);
+    	returnStruct.see_more = query_result;
+    	returnStruct.values.genre_id = null; 
+   	 
+    	return returnStruct;
+    }
+
+
+    return null;
+}
 export async function ServerSideRequests_anime(requestType, requestParam){
     let response = {status: 0, statusText: ''};
     switch(requestType){
+
+        case 'getAnimeByID':{
+            let sql = 'SELECT `id`,`anime_name`,`anime_season` FROM `anime_table` WHERE `id` in ?' ;
+            let values = [requestParam.animeIDs.map((value)=>value.id)];
+            let query_result = await database.query(sql,[values]);
+            response.values = query_result;
+            if(query_result.length>0){
+                response.status = 200;
+                response.statusText = 'OK';
+            }
+            else{
+                response.status = 404;
+                response.statusText = 'No anime found';
+            }
+            break;
+        }
+        case 'getAnimeByGenre':{
+            //the genre name will be lower case in the database too
+            let sql = 'SELECT `id` FROM `genre_table` WHERE `genre_name` = ' + database.escape(requestParam.genre_name);
+            let query_result = await database.query(sql);
+            if(query_result[0]){
+                //the genre id was found
+                sql = `SELECT \`anidubsbd\`.\`anime_table\`.\`id\`,\`anime_name\`,\`anime_season\` FROM \`anidubsbd\`.\`anime_table\` INNER JOIN \`anidubsbd\`.\`anime_genre\` ON \`anime_id\`=\`anidubsbd\`.\`anime_table\`.\`id\` AND \`genre_id\` = ` + query_result[0].id;
+                query_result = await  database.query(sql);
+                response.status = 200;
+                response.statusText = 'OK';
+                response.values = query_result;
+            }
+            else{
+                response.status = 404;
+                response.statusText = 'Not found';
+            }
+            break;     
+        }
+        case 'getTabInfo':{
+            const param = requestParam.pagetype;
+                if(param ==='trending'){
+                    //if it's the nigga in the hood, don't send any other nigga
+                    response.values = await doQueryByField('anime_table',['id','anime_name','anime_season'],null,0,[{name: 'priority', order: 'ASC'},{name: 'anime_totalview', order: 'DESC'}]);
+                }
+                else if( param ==='newest')
+                {
+                    response.values = await doQueryByField('anime_table',['id','anime_name','anime_season'],null,0,[{name: 'priority', order: 'ASC'},{name: 'anime_insertion_date', order: 'DESC'}]);
+                }
+                else{
+
+                    response.values = await doQueryByField('anime_table',['id','anime_name','anime_season'],{name: 'anime_type', value: param},0,[{name: 'priority', order: 'ASC'}, {name: 'anime_totalview', order: 'DESC'}]);
+                }
+                
+                response.status = 200;
+                response.statusText = 'OK';
+                break;
+
+        }
+            case 'info':{
+                    let resultJSON = await getInfos(requestParam.id);
+                    if(resultJSON)
+                    {
+                        response.status = 200;
+                        response.statusText = 'OK';
+                        response.values = resultJSON;
+                    }
+                    else{
+                        response.status = 404;
+                        response.statusText = 'Not found';
+                    }  
+               break;
+            }
         case 'incrementViewCounter':{
             let sql = `UPDATE \`anime_table\` SET \`anime_totalview\` = \`anime_totalview\` +1 WHERE \`id\`  = ${requestParam.id}`;
             database.query(sql);
@@ -79,90 +233,8 @@ export async function ServerSideRequests_anime(requestType, requestParam){
     return response;
 }
 
-//sanitize SQL queries with LIKE keyword
-function sanitizeLIKE(value){
-    let percentage_escaped = value.replace(/\%/g,'\\%');
-    return percentage_escaped.replace(/\"/g,'\"');
-}
 
 
-//this helper function takes an object which contains name and order field, and return a string 
-//looks like '`name` order' to be used for ORDER field in SQL query
-function orderToString(obj){
-    return ` \`${obj.name}\` ${obj.order} `;
-}
-
-async function doQueryByField(table_name,columns,fields,short,order_list){
-    //if the short is not 0, then do a LIMIT in SELECT
-    //if the columns contain *, then, don't do the mapping
-    let order_sql = '';
-    if(!columns.find((value)=> value === '*')){
-        columns = columns.map((value)=>{
-            return `\`${value}\``;
-        });
-    }
-    if(order_list){
-        //make the SQL statement
-        order_sql = ' ORDER BY' + ((order_list.map((value)=>{return orderToString(value)})).join());
-    } 
-
-    let sql = `SELECT ${columns.join()} FROM \`${table_name}\`` + (fields?` WHERE \`${fields.name}\` = '${fields.value}' `:"")  + order_sql + (Boolean(short)? ` LIMIT ${short}`: "") ;
-    
-    let query_result = await database.query(sql);
-    return query_result;
-}
-
-async function doQueryLikeField(table_name,columns,field, short,order_list){
-    //if the short is not 0, then do a LIMIT in SELECT
-    //if the columns contain *, then, don't do the mapping
-    let order_sql = '';
-    if(!columns.find((value)=> value === '*')){
-        columns = columns.map((value)=>{
-            return `\`${value}\``;
-        });
-    }
-
-    if(order_list){
-        //make the SQL statement
-        order_sql = ' ORDER BY' + ((order_list.map((value)=>{return orderToString(value)})).join());
-    }
-    let sql = `SELECT ${columns.join()} FROM \`${table_name}\`` + (field && field.name && field.value? 
-        ` WHERE \`${field.name}\` LIKE '%` + sanitizeLIKE(field.value) + "%'": "") + order_sql +(short && short!==0?` LIMIT ${short}`: "");
-    let query_result = await database.query(sql);
-    return query_result;
-}
-
-
-//get all the information regarding an anime
-async function getInfos(id){
-    //first, get the general informations
-    let sql = `SELECT \`anime_table\`.*, \`genre_id\` FROM \`anime_table\` INNER JOIN \`anime_genre\` ON \`anime_id\` = ${id} WHERE \`id\` = ${id}`;
-    let query_result = await database.query(sql);
-    if(query_result[0]){
-    let returnStruct = {values:{
-        ...query_result[0]
-    }};
-
-    let genre_ids = (query_result.map((value)=>{
-        return value.genre_id;
-    })).join();
-    //now, get all the genre_name
-    sql = 'SELECT `genre_name` FROM `genre_table` WHERE `id` IN (' + genre_ids + ')';
-    query_result = await database.query(sql);
-
-    returnStruct.values.anime_genres = query_result.map(value=>value.genre_name);
-    //get the anime name
-    sql = 'SELECT `id`,`anime_name`,`anime_season` FROM `anidubsbd`.`anime_table` WHERE `id` IN (SELECT `anime_id` FROM `anidubsbd`.`anime_genre` WHERE `genre_id` IN (' + genre_ids + ')) ORDER BY `priority`,`anime_totalview` DESC LIMIT 6';
-    query_result = await database.query(sql);
-    returnStruct.see_more = query_result;
-    returnStruct.values.genre_id = null; 
-    
-    return returnStruct;
-}
-
-
-    return null;
-}
 
 export async function GET(req,res){
     const url = new URL(req.url);
@@ -184,24 +256,10 @@ export async function GET(req,res){
                 break;
             }
 
-            case 'info':{
-                if(url.searchParams.get('id')){
-                    //try to get the id;
-                    const id = parseInt(url.searchParams.get('id'));
-                    //get all the information about the anime in question
-                    if(id)
-                    {
-                        resultJSON = await getInfos(id);
-                        if(resultJSON)
-                        {
-                            response = new Response(JSON.stringify(resultJSON));
-                        }
-                    }
-               }
-               break;
-            }
+            
 
             case 'trending':
+            case 'newest':
             case 'bsub':
             case 'bdub':
             case 'edub':
@@ -209,10 +267,15 @@ export async function GET(req,res){
                 const param = url.searchParams.get('param');
                 if(param ==='trending'){
                     //if it's the nigga in the hood, don't send any other nigga
-                    resultJSON.values = await doQueryByField('anime_table',['id','anime_name','anime_season'],null,6);
+                    resultJSON.values = await doQueryByField('anime_table',['id','anime_name','anime_season'],null,6,[{name: 'priority', order: 'ASC'},{name: 'anime_totalview', order: 'DESC'}]);
+                }
+                else if( param ==='newest')
+                {
+                    resultJSON.values = await doQueryByField('anime_table',['id','anime_name','anime_season'],null,6,[{name: 'priority', order: 'ASC'},{name: 'anime_insertion_date', order: 'DESC'}]);
                 }
                 else{
-                    resultJSON.values = await doQueryByField('anime_table',['id','anime_name','anime_season'],{name: 'anime_type', value: param},6);
+
+                    resultJSON.values = await doQueryByField('anime_table',['id','anime_name','anime_season'],{name: 'anime_type', value: param},6,[{name: 'priority', order: 'ASC'}, {name: 'anime_totalview', order: 'DESC'}]);
                 }
                 
                 response = new Response(JSON.stringify(resultJSON));
@@ -238,8 +301,16 @@ export async function GET(req,res){
                 }
                 break;
             } 
+            case 'getGenres':{
+                let sql = 'SELECT * FROM `genre_table`';
+                let query_result = await database.query(sql);
+                resultJSON.values = query_result;
+                response = new Response(JSON.stringify(resultJSON),{status: 200, statusText: 'OK'});
+                break;
+            }
         }
     }
     database.end();
     return response;
 }
+

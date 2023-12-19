@@ -25,7 +25,9 @@ export default async function SearchPage({searchParams}){
     return (
         <>
             <HeaderClient/>
-            <h2 style={{display: "inline", color: "whitesmoke"}}>Searched for</h2> <h3 style={{display: "inline", color: "whitesmoke"}}>{paramResult}</h3>
+            <div style={{marginTop: '20px'}}>
+                <h2 style={{marginTop: '20px', display: "inline", color: "whitesmoke"}}>Searched for</h2> <h3 style={{display: "inline", color: "whitesmoke"}}>{paramResult}</h3>
+            </div>
             <div className={styles.tabpage}>
                 {
                     json.values.map((value) =>{

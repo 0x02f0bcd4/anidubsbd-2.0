@@ -9,8 +9,29 @@ import hamburger from "../public/bars.svg";
 import { useEffect, useState } from "react";
 import Login from "@/components/Login";
 import { getSession } from "next-auth/react";
+import HeaderClient from "@/components/search/header_client";
 
 function LoadTabs({type}){
+	let tabname = '';
+	switch(type){
+		case 'trending':
+			tabname = 'Trending';
+			break;
+		case 'newest':
+			tabname = "Newest";
+			break;
+		case 'bsub':
+			tabname = 'Bangla Subbed';
+			break;
+		case 'bdub':
+			tabname = 'Bangla dubbed'
+			break;
+		case 'edub':
+			tabname = 'English dubbed';
+			break;
+		default:
+			tabname = 'unknown'
+	}
 	const [tabContents,setTabContents] = useState({empty: true});
 	useEffect(()=>{
 		const fetchCall = async () =>{
@@ -32,7 +53,7 @@ function LoadTabs({type}){
 		<>
 		<div className={styles.tabStyle}>
 			<div className={styles.tabHeader}>
-				<h2>{type}</h2>
+				<h2>{tabname}</h2>
 				<a href={`/tabpage/${type}`}>See more</a>
 			</div>
 			<div className={styles.cards}>
@@ -55,33 +76,9 @@ function LoadTabs({type}){
 		</>
 	);
 }
-
-function Page() {
-  const [showHamburger,setShowHamburger] = useState(false);
-  return (
+function Page() { return (
     <>
-    	<header className={styles.headerHome}>
-        	<Image className={styles.logo} src={Logo} alt="logo"/>
-        	<div className={styles.searchbarHome}>
-				<Search/>
-        	</div>
-        	<div className={styles.authentication}>
-				<Login/>
-        	</div>
-        	<Image src={hamburger} className={styles.hamburger} alt="hamburger" onClick={()=>setShowHamburger(!showHamburger)}/>
-    	</header>
-   	 
-   	 
-    	<div className={styles.hamburger_options} style={showHamburger?{transform: "translateX(-50%)"}:{}}>
-			<div className={styles.searchbarHamburger}>
-        		<Search onLowerDevice={showHamburger}/>
-			</div>
-        	<p>Home</p>
-        	<p>About us</p>
-        	<div className={styles.authentication_phone}>
-        	</div>
-    	</div>
-
+		<HeaderClient/>	
 		<div className={styles.banner}>
 			<h3>স্বাগতম<br/>বাংলাদেশের অন্যতম জনপ্রিয় অ্যাানিমে ফ্যানডাবিং প্ল্যাটফর্ম<br/> AniDubs এ</h3>	
 			<Image src={Background} alt="Front Banner"/>
@@ -89,7 +86,10 @@ function Page() {
 
 
 		<LoadTabs type={"trending"}/>
+		<LoadTabs type={'newest'}/>
+		<LoadTabs type={'bdub'}/>
 		<LoadTabs type={"bsub"}/>
+		<LoadTabs type={'edub'}/>
     </>
   );
 }

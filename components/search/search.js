@@ -40,13 +40,20 @@ function Search({onLowerDevice}) {
         <input type="text" name="name" placeholder='অ্যানিমে খুঁজুন' value={formField} onChange={handleChange} autoComplete="off"/>
 
         <div className={styles.searchResult}>
+            <div className={styles.items}>
             {
                 searchResults.map((value,index)=>{
+                    let fullname = value.anime_name + (value.anime_season?' '+value.anime_season:"");
                     return (
-                        <a key={index} href={`/animeInfo?id=${value.id}`}>{value.anime_name}</a>
-                    )
+                        <a className={styles.item_div} key={value.id} href={`/animeInfo?id=${value.id}`}>
+                            <img src={`/Posters/${fullname} Poster.jpg`} alt={fullname}/>
+                            <span className="anime_name">{fullname}</span>
+                        </a>
+                    );
+                    
                 })
             }
+            </div>
         </div>
     </form>
   )

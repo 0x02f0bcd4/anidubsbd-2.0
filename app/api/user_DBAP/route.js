@@ -32,6 +32,34 @@ export async function ServerSideRequests_user(requestType,requestParam){
             response.values = query_result[0];
             break;
         } 
+
+        case 'getWatchlist':{
+            //get the ID and wait for the list of animeID we get
+            let sql = 'SELECT `id` FROM `user_' + database.escape(requestParam.userID) + '_watchlist`';
+            let query_result = await database.query(sql);
+            //now call the ServerSideRequests_anime to get the anime id, anime_name, and anime_season
+            if(query_result.length === 0){
+                response.status = 404;
+                response.statusText = 'Not found';
+                response.values = {};
+                break; //early switch case break;
+            }
+            console.log("the query_result for user's watchlist is: ", query_result);
+            response =  await ServerSideRequests_anime('getAnimeByID',{animeIDs: query_result});
+            break;
+        }
+        case 'getReviewByID':{
+            let sql = `SELECT \`review\` FROM \`user_${requestParam.userID}_watchlist\` WHERE \`id\`=${requestParam.animeID}`;
+            let query_result = await database.query(sql);
+            if(!query_result[0]){
+                response.values.watched = false;
+            }
+            else{
+                response.values.watched = true;
+                response.values.review = query_result[0].review;
+            }
+            break;
+        }
     }
     return response;
 }

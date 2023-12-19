@@ -1,8 +1,8 @@
 'use client';
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
-import { useEffect, useState, useRef } from "react";
-
+import { useState, useRef } from "react";
+import styles from './welcome.module.css';
 export default function Page(){
     const session = useSession();
     const usernameRef = useRef();
@@ -64,7 +64,7 @@ export default function Page(){
                 fetch(`/api/user_DBAP?param=insertUser&username=${username}&email=${session.data.user.email}&provider=${session.data.provider}&picture=${session.data.user.image}`);
                 setUsername({status: 'done'});
                 session.update({verified: true});
-            }
+            } 
         }
         
     }
@@ -77,7 +77,28 @@ export default function Page(){
         console.log("not redirecting");
     }
 
-    return(
+
+    return (
+        <>
+            <h2>AniDubsBD এ আপনাকে স্বাগতম । আপনাকে এক্যাউন্টটি তৈরি করতে একটি ইউজারনেম পছন্দ করতে হবে। আপনি পরবর্তীতে আপনার ইউজারনেমটি পরিবর্তন করতে পারবেন না ।</h2>
+            <h2>প্রথমে সিদ্ধান্ত নিন, তারপর 'অর্ডার করুন' বাটনে ক্লিক করুন</h2>
+            <h4 style={isAvailable.status === 'notdecided'?{display: 'block'}:{display: 'none'}}>অনুগ্রহপূর্বক একটি ইউজারনেম নিচের ছকটিতে লিখুন</h4>
+            <h4 style={showLengthError?{display: 'block',color: 'red'}:{display: 'none'}}>আপনার ইউজারনেমটি অন্তত পাঁচ বর্ণের হতে হবে</h4>
+            <h4 style={isAvailable.status==='notavailable'?{display: 'block', color: 'red'}:{display: 'none'}}>এই ইউজারনেমটি ইতোমধ্যে অন্য একজন ব্যক্তি নিয়েছে</h4>
+            <h4 style={isAvailable.status === 'available'?{display:'block', color: 'green'}:{display: 'none'}}>এই ইউজারনেমটি নেয়া যেতে পারে</h4>
+
+            <fieldset className={styles.choosing}>
+                <legend>ইউজারনেম পছন্দ করুন</legend>
+                <form className={styles.choice_form} onSubmit={(e)=>e.preventDefault()}>
+                    <input type='text' name='checkusername' placeholder="আপনার পছন্দের ইউজারনেমটি লিখুন" ref={usernameRef}/>
+                    <button onClick={handleChecking}>সিদ্ধান্ত নিন</button>
+                    <button onClick={handleSelecting}>অর্ডার করুন</button>
+                </form>
+            </fieldset>
+        </>
+    )
+
+    /*return(
         <>
             <h2>Welcome to the site, here you need to decide a new username</h2>
             <h2 style={showLengthError?{display: "block"}:{display: "none"}}>Your username needs to be at least 5 characters wide</h2>
@@ -91,6 +112,6 @@ export default function Page(){
             </form>
             
         </>
-    );
+    );*/
 }
 

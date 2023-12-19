@@ -1,0 +1,385 @@
+.anime_title{
+    text-align: center;
+}
+
+.episode_title{
+    text-align: center;
+}
+
+.watching{
+    font-size: 1.3rem;
+    color: cyan;
+}
+
+.anime_ep_name{
+    font-size: 1.3rem;
+    color: orangered;
+}
+
+
+.ViewPort{
+    display: flex;
+    flex-direction: row;
+    width: 90vw;
+    height: 80vh;
+    justify-content: space-between;
+    align-items: center;
+    margin: auto;
+}
+
+.ViewPort > iframe{
+    width: 50%;
+    aspect-ratio: 16/9;
+    border-radius: 15px;
+}
+
+.viewpage_episode_list{
+    padding: 0px;
+    width: 30%;
+    height: auto;
+    max-height: 100%;
+    align-items: left;
+    overflow-y: auto;
+    border-radius: 10px;
+    border-width: 1px;
+    border-color: cyan;
+    border-style: solid;
+
+    /*To not show the scrollbar*/
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;
+}
+
+/*For webkit based browser*/
+.viewpage_episode_list::-webkit-scrollbar{
+    display: none;
+}
+
+
+.viewpage_episode_list_item{
+    list-style-type: none;
+    border-radius: 5px;
+    
+}
+
+.viewpage_episode_list_item:hover{
+    background-color: #e47100;
+}
+
+.viewpage_episode_list_item > a{
+    display: block;
+    color: whitesmoke;
+    text-decoration: none;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.viewpage_episode_list_item > a > p{
+    padding-left: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.viewpage_episode_list_item > a:visited{
+    color: whitesmoke;
+}
+
+.see_more_tab{
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 5px;
+}
+
+.title{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    border-color: whitesmoke;
+    border-style: solid;
+    border-width: 0px 0px 2px 0px;
+
+    margin-bottom: 2px;
+}
+
+.title > h3{
+    border: 0px;
+}
+
+.cards{
+    width: 100%;
+    height: 50vh;
+    margin-top: 10px;
+}
+
+.items{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+    height: 100%;
+    white-space: nowrap;
+    overflow-y: scroll;
+    -ms-overflow-style: none;
+    scrollbar-width: auto;
+    padding: 2px;
+    justify-content: center;
+    align-items: center;
+}
+
+.items::-webkit-scrollbar{
+    display: none;
+}
+
+.item_div{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    max-width: 150px;
+    max-height: 250px;
+    padding: 15px;
+    text-decoration: none;
+}
+
+.item_div:hover{
+    cursor: pointer;
+    border-width: 2px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 5px #7c6f64;
+}
+
+.item_div > img{
+    width: 100%;
+    height: 80%;
+    border-radius: 4px;
+    border-width: 1px;
+}
+
+
+.item_div > span{
+    color: whitesmoke;
+    text-align: center;
+    margin: 0px;
+    width: 80%;
+    height: 10%;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.item_div > span:hover{
+    cursor: pointer;
+}
+
+
+.comment_section{
+    width: 90vw;
+    height: 60vh;
+    margin-left: auto;
+    margin-right: auto;
+    border-color: aqua;
+    border-width: 2px;
+    border-radius: 5px;
+    border-style: solid;
+}
+
+.postedcomment{
+    height: 60%;
+    width: 96%;
+    margin-left: auto;
+    margin-right: auto;
+    overflow-y: scroll;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.postedcomment::-webkit-scrollbar{
+    display: none; 
+}
+
+.postcomment{
+    width: 100%;
+    height: 30%;
+}
+
+.comment_section > h2{
+    height: 10%;
+    text-align: center;
+    margin: 0px;
+}
+
+.comment{
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    padding-left: 1rem;
+    border-width: 1px;
+    border-radius: 5px;
+    border-color: orangered;
+    border-style: solid;
+    background-color: #282828;
+}
+
+.comment > h3{
+    margin: 0px;
+    margin-bottom: 1rem;
+    border: 0px;
+    border-bottom-width: 1px;
+    border-color: orangered;
+    border-style: solid;
+}
+
+.comment > h4{
+    margin-bottom: 0px;
+    margin-top: 1rem;
+    padding-left: 1rem;
+}
+
+
+.commentbox{
+    background-color: whitesmoke;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-between;
+}
+
+.commentbox > textarea{
+    width: 100%;
+    height: 78%;
+    padding: 0px;
+    margin: 0px;
+    border: 0px;
+    font-size: 1rem;
+    resize: none;    
+}
+
+.commentbox > textarea:focus{
+    outline: none;
+    border-bottom-width: 1px;
+    border-color: black;
+    border-style: solid;
+}
+
+.commentbox > button{
+    height: 20%;
+    width: fit-content;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    
+}
+
+
+
+@media screen and (max-width: 1000px){ 
+    .cards{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        height: auto;
+        margin-top: 10px;
+    }
+
+
+    .items{
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        width: 100%;
+        height: auto;
+        white-space: nowrap;
+        padding: 2px;
+        justify-content: center;
+        align-items: center;
+    }
+
+
+    .ViewPort{
+        display: flex;
+        flex-direction: column;
+        width: 90vw;
+        height: auto;
+        margin: auto;
+    }
+
+    .ViewPort > iframe{
+        width: 100%;
+        aspect-ratio: 16/9;
+        border-width: 0px;
+    }
+
+    .viewpage_episode_list{
+        padding: 0px;
+        width: 100%;
+        height: auto;
+        max-height: 50vh;
+        align-items: left;
+        overflow-y: auto;
+        border-radius: 10px;
+        border-width: 1px;
+        border-color: cyan;
+        border-style: solid;
+    }
+    
+}
+
+
+@media screen and (max-width: 400px) {
+    
+    .cards{
+        width: 90vw;
+        height: auto;
+    }
+
+
+    .items{
+        display: block;
+        scrollbar-width: none;
+        overflow: visible;
+        width: 100%;
+        height: 100%;
+        white-space: nowrap;
+        padding: 0px;
+    }
+
+    .item_div{
+        display: flex;
+        flex-direction: row;
+        max-width: none;
+        max-height: none;
+        padding: 0px;
+        width: 100%;
+        height: 100%;
+        text-decoration: none;
+        margin: 10px;
+    }
+
+    .item_div > img{
+        width: 15%;
+        height: auto;
+        border-radius: 4px;
+        border-width: 1px;
+    }
+
+    .item_div > span{
+        display: inline-flex;
+        flex-direction: row;
+        align-items: center;
+        color: whitesmoke;
+        text-align: center;
+        margin: 0px;
+        width: 80%;
+        height: 100%;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+}
