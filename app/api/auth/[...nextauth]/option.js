@@ -37,10 +37,7 @@ export const options = {
                             jwt_details.token.username = response.values.username;
                             jwt_details.token.verified = true;
                         }
-                    }
-                    else{
-                        console.log("the response status wasn't 200: ", response.status);
-                    }
+                    } 
                 }
             }
             else if(jwt_details.trigger === 'signIn' && jwt_details.account && jwt_details.user){

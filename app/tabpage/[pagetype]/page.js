@@ -55,7 +55,6 @@ export async function generateMetadata({params}){
 export default async function Page({params}){
 
     params.pagetype = params.pagetype.toLowerCase();
-    console.log("the pagetype is: ", params.pagetype);
     switch(params.pagetype){
         case 'trending':
         case 'newest':

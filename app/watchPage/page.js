@@ -23,9 +23,7 @@ function fetchComments(animeID,episodeID, setter){
 
 
 function PostComment(userID, animeID, episodeID, comment, newCommentSection){
-    console.log("the animeID and the episodeID is: ", animeID, episodeID);
     let form = new FormData();
-        console.log("the userID is: ", userID);
         form.append('userID',userID);
         form.append('animeID',animeID);
         form.append('episodeID',episodeID);
@@ -36,7 +34,6 @@ function PostComment(userID, animeID, episodeID, comment, newCommentSection){
             body: form
         }).then((response)=>{
             //the fetch request was succesful, fetch the comments again
-            console.log("the response was: ", response.status);
             fetchComments(animeID,episodeID,newCommentSection);
         });
 }
@@ -45,7 +42,6 @@ function LoadComment({animeID,episodeID})
 {
     const userSession = useSession();
     const [postCommentJSX, setPostCommentJSX] = useState((<h2>Loading, please wait...</h2>));
-    console.log("the episodeID Just got updated: ", episodeID);
     const commentRef = useRef();
     const [comments,setComments] = useState({
         empty:true
@@ -79,8 +75,8 @@ function LoadComment({animeID,episodeID})
     if(!comments){
         return (
             <>
-                <h2>The comments couldn't be loaded, 
-                    either because the comment section doesn't exist for this anime, or the anime doesn't exist
+                <h2>The comments couldn&apos;t be loaded, 
+                    either because the comment section doesn&apos;t exist for this anime, or the anime doesn&apos;t exist
                 </h2>
             </>
         );
@@ -177,7 +173,6 @@ export default function Page(){
         );
     }
     
-    console.log("the episodeList is: ", episodeList);
     //if it was none of the cases, then it means that fetching is done and the data is already here
     const handleEpisodeChange = (event)=>{
         const newEpisode = event.target.getAttribute('episode-number');
@@ -223,8 +218,6 @@ export default function Page(){
                            {
                                 episodeList.values.see_more.map((value,index)=>{
                                     let fullname = value.anime_name + (value.anime_season?" "+value.anime_season:"");
-                                    console.log('the value.id: ', value.id);
-                                    console.log("episodeList.values.id: ", episodeList.values.id);
                                     if(value.id !== episodeList.values.id){
 
                                         return (

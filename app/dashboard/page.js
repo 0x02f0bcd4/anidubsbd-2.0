@@ -26,7 +26,6 @@ export const metadata = {
 export default async function Page(){
     //get the session result
     const session = await getServerSession(options);
-    console.log("the session is: ", session);
     if(session.verified === true){
         //the user was found, show the data
         //get the watchlist
@@ -87,7 +86,7 @@ export default async function Page(){
     return (
         <>
             <HeaderClient/>
-            <h2>You still haven't completed your signing in process. Visit <a href="/welcome" style={{textDecoration: "none", color: 'orangered'}}>here to complete your signing up process</a></h2>
+            <h2>You still haven&apos;t completed your signing in process. Visit <a href="/welcome" style={{textDecoration: "none", color: 'orangered'}}>here to complete your signing up process</a></h2>
         </>
     ); 
 }

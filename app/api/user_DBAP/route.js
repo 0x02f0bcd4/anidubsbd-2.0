@@ -12,7 +12,8 @@ const database = mysql({
         user: "anidubs1_admins",
         password: "4N4dm1nP455W0RDth4t1550H4RD",
         database: process.env.UserDB
-    }
+    },
+    library: require("mysql2")
 });
 
 
@@ -44,7 +45,6 @@ export async function ServerSideRequests_user(requestType,requestParam){
                 response.values = {};
                 break; //early switch case break;
             }
-            console.log("the query_result for user's watchlist is: ", query_result);
             response =  await ServerSideRequests_anime('getAnimeByID',{animeIDs: query_result});
             break;
         }
@@ -154,15 +154,12 @@ export async function GET(req){
                 let values = [[username,email,picture, provider]];
                 try{
                     let query_result = await database.query(sql,[values]);
-                    console.log('the insertion query_result was: ', query_result);
                     sql = 'SELECT `id` FROM `users` WHERE `email` = ' + database.escape(email);
                     sql = 'SELECT `id` FROM `users` WHERE `id` = LAST_INSERT_ID()';
                     query_result = await database.query(sql);
-                    console.log('the SELECT id query_result was :', query_result);
                     //since the user insertion succeeded, we are going to create a new watchlist table
                     sql = 'CREATE TABLE `users`.`' + `user_${query_result[0].id}_watchlist` + '` (`id` INT NOT NULL, PRIMARY KEY (`id`));'
                     query_result = await database.query(sql);
-                    console.log("the query_result for watchlist table was: ", query_result)
                     response = new Response('the insertion was success',{status: 200, statusText: 'OK'});
                 }
                 catch(err){
@@ -193,7 +190,6 @@ export async function POST(req){
     //try to get the form result
     let response = undefined;
     const formData = await req.formData();
-    console.log('the formdata is: ', formData);
     const userID = formData.get('userID');
     const animeID = formData.get('animeID');
     const episodeID = formData.get('episodeID'); 
@@ -202,18 +198,13 @@ export async function POST(req){
         //all the parameters was accessed
         //first, verify whether the user actually exists, while also checking if the animeID and the episodeID is correct
         //const promises = await Promise.all([ServerSideRequests_user('getUserByID',{id: userID}), ]);
-        console.log("all tests were passed!");
         ServerSideRequests_anime('verifyAnimeAndEpisode',{animeID: animeID, episodeID: episodeID});
         const promises = await Promise.all([ServerSideRequests_anime('verifyAnimeAndEpisode',{animeID: animeID, userID: userID, episodeID: episodeID}),
                                             ServerSideRequests_user('getUserByID',{userID: userID})]);
         //if the animeID and episodeID and the userID actually exist
-        console.log('the promises[0].status is: ',promises[0].status);
 
-        console.log('the promises[1].status is: ', promises[1].status);
         if(promises[0].status === 200 && promises[1].status === 200){
             //everything is alright, try to insert into the comments table
-            console.log("every tests passed");
-            console.log("inserting into the database");
             //send an insertion request
             ServerSideRequests_anime('insertComment', {animeID: animeID, userID: userID, episodeID: episodeID, comment: comment});
         } 

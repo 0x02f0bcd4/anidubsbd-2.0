@@ -68,12 +68,8 @@ async function AnimeInfo({searchParams}){
 
         if(promises[0].status!==200){
             //the status wasn't good, return back to home
-            console.log("the promises[0] status wasn't good, result was: ", promises[0]);
             redirect('http://localhost:3000/');
-        }
-        else{
-            console.log("the promises[0] returned a 200");
-        }
+        } 
 
         const json = promises[0].values;
         if(json.values.anime_type === 'BDUB'){
@@ -145,7 +141,6 @@ async function AnimeInfo({searchParams}){
         )
     } 
     
-    console.log("the animeID was malformed");
     redirect('http://127.0.0.1:3000/');
     return (
         <>

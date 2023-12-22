@@ -70,18 +70,14 @@ export default function Page(){
     }
     
     if(typeof(username)!=='string' && username.status === 'done'){
-        console.log("redirecting");
         redirect('/');
-    }
-    else{
-        console.log("not redirecting");
-    }
+    } 
 
 
     return (
         <>
             <h2>AniDubsBD এ আপনাকে স্বাগতম । আপনাকে এক্যাউন্টটি তৈরি করতে একটি ইউজারনেম পছন্দ করতে হবে। আপনি পরবর্তীতে আপনার ইউজারনেমটি পরিবর্তন করতে পারবেন না ।</h2>
-            <h2>প্রথমে সিদ্ধান্ত নিন, তারপর 'অর্ডার করুন' বাটনে ক্লিক করুন</h2>
+            <h2>প্রথমে সিদ্ধান্ত নিন, তারপর &apos;অর্ডার করুন&apos; বাটনে ক্লিক করুন</h2>
             <h4 style={isAvailable.status === 'notdecided'?{display: 'block'}:{display: 'none'}}>অনুগ্রহপূর্বক একটি ইউজারনেম নিচের ছকটিতে লিখুন</h4>
             <h4 style={showLengthError?{display: 'block',color: 'red'}:{display: 'none'}}>আপনার ইউজারনেমটি অন্তত পাঁচ বর্ণের হতে হবে</h4>
             <h4 style={isAvailable.status==='notavailable'?{display: 'block', color: 'red'}:{display: 'none'}}>এই ইউজারনেমটি ইতোমধ্যে অন্য একজন ব্যক্তি নিয়েছে</h4>

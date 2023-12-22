@@ -7,7 +7,8 @@ const database = mysql({
         user: 'anidubs1_admins',
         password: "4N4dm1nP455W0RDth4t1550H4RD",
         database: process.env.AnimeDB,
-    }
+    },
+    library: require('mysql2')
 });
 
 
@@ -126,7 +127,6 @@ export async function ServerSideRequests_anime(requestType, requestParam){
         }
         case 'getAnimeByID':{
             let sql = 'SELECT `id`,`anime_name`,`anime_season` FROM `anime_table` WHERE `id` in ?' ;
-            console.log("the sql was: ", sql);
             let values = [requestParam.animeIDs.map((value)=>value.id)];
             let query_result = await database.query(sql,[values]);
             response.values = query_result;
@@ -238,7 +238,6 @@ export async function ServerSideRequests_anime(requestType, requestParam){
             let sql = 'INSERT INTO `anime_comments` (`anime_id`,`episode_id`,`user_id`,`comment`) VALUES ?';
             let values = [[requestParam.animeID, requestParam.episodeID, requestParam.userID, requestParam.comment]];
             let query_result = await database.query(sql, [values]);
-            console.log("the comment insertion query_result was: ", query_result);
             response.status = 200;
             response.statusText = 'OK';
             break;
@@ -308,7 +307,6 @@ export async function GET(req,res){
                     ` \`anidubsbd\`.\`anime_comments\`.\`anime_id\` = ${animeID} AND` +
                     ` \`anidubsbd\`.\`anime_comments\`.\`episode_id\` = ${episodeID}`;
                     resultJSON.values = await database.query(sql);
-                    console.log("the resultJSON is: ", resultJSON.values);
                     response = new Response(JSON.stringify(resultJSON)); 
                 }
                 else{
