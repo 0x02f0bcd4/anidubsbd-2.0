@@ -2,13 +2,8 @@
 
 import styles from "./page.module.css";
 import Image from "next/image";
-import Logo from "../public/Logo.png";
 import Background from "../public/Background.png";
-import Search from "@/components/search/search";
-import hamburger from "../public/bars.svg";
 import { useEffect, useState } from "react";
-import Login from "@/components/Login";
-import { getSession } from "next-auth/react";
 import HeaderClient from "@/components/search/header_client";
 
 function LoadTabs({type}){
@@ -54,7 +49,7 @@ function LoadTabs({type}){
 		<div className={styles.tabStyle}>
 			<div className={styles.tabHeader}>
 				<h2>{tabname}</h2>
-				<a href={`/tabpage/${type}`}>See more</a>
+				<a href={`/tabpage/${type}`}>More {type.toUpperCase()}</a>
 			</div>
 			<div className={styles.cards}>
 				<div className={styles.items}>
@@ -64,7 +59,7 @@ function LoadTabs({type}){
 					fullname = value.anime_name + (value.anime_season?" "+value.anime_season: "");
 					return (
 						<a className={styles.item_div} key={index} href={`/animeInfo?id=${value.id}`}>
-							<img src={`/Posters/${fullname} Poster.jpg`} className={styles.itemImage}/>
+							<img src={`/Posters/${fullname} Poster.jpg`} className={styles.itemImage} alt={`Poster of ${fullname}`}/>
 							<p className={styles.itemName}>{fullname}</p>
 						</a>
 					);

@@ -4,16 +4,75 @@ import HeaderClient from "@/components/search/header_client";
 import { getServerSession } from "next-auth";
 import { options } from "../api/auth/[...nextauth]/option";
 import { ServerSideRequests_anime } from "../api/db_ap/route";
-import { ServerSideRequests_user } from "../api/user_DBAP/route";
+
+//get the anime name and season(yeah yeah I know, we are fetching twice)
+export async function generateMetadata({params,searchParams}){
+    const animeID = parseInt(searchParams.id);
+    let anime_name = undefined;
+    let anime_season = undefined;
+    let anime_type = undefined;
+    if(animeID){
+        let query_result = await ServerSideRequests_anime('getAnimeForMetadata',{id: animeID});
+        if(query_result.status === 200){
+            //the anime was found successfully
+            anime_name = query_result.values[0].anime_name;
+            anime_season = query_result.values[0].anime_season;
+            anime_type = query_result.values[0].anime_type;
+            switch(anime_type){
+                case 'BDUB':{
+                    anime_type = 'Bangla Dubbed';
+                    break;
+                }
+                case 'BSUB':{
+                    anime_type = 'Bangla Subbed';
+                    break;
+                }
+                case 'EDUB':{
+                    anime_type = 'English Dubbed';
+                    break;
+                }
+            }
+        } 
+    }
+
+    if(anime_name){
+        //if the anime_name is set, it means that there's an animeID to show
+        let fullname = anime_name + (anime_season?' '+anime_season: '');
+        return {
+            title: `Watch ${fullname} on AniDubsBD`,
+            description: `Watch ${fullname} ${anime_type} only on AniDubsBD at highest quality, along with many more.`,
+            openGraph:{
+                title: `Watch ${fullname} on AniDubsBD`,
+                description: `Watch ${fullname} ${anime_type} only on AniDubsBD at highest quality, along with many more.`,
+            }
+        }
+    }
+    
+    return {
+        title: "Error, no anime found",
+        description: "No such anime found",
+        openGraph: {
+            title: "Lost, or missing anime",
+            description: "No such anime found",
+        }
+    }
+}
+
+
+
 async function AnimeInfo({searchParams}){
     //get the session id, if avaiable
     const animeID = parseInt(searchParams.id);
     if(animeID){
         let promises = await Promise.all([ServerSideRequests_anime('info',{id: animeID}),getServerSession(options)]); 
 
-        if(promises[0].status!=200){
+        if(promises[0].status!==200){
             //the status wasn't good, return back to home
+            console.log("the promises[0] status wasn't good, result was: ", promises[0]);
             redirect('http://localhost:3000/');
+        }
+        else{
+            console.log("the promises[0] returned a 200");
         }
 
         const json = promises[0].values;
@@ -86,6 +145,7 @@ async function AnimeInfo({searchParams}){
         )
     } 
     
+    console.log("the animeID was malformed");
     redirect('http://127.0.0.1:3000/');
     return (
         <>

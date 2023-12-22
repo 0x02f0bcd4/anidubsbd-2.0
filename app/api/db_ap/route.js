@@ -6,7 +6,7 @@ const database = mysql({
         port: 3306,
         user: 'anidubs1_admins',
         password: "4N4dm1nP455W0RDth4t1550H4RD",
-        database: "anidubsbd"
+        database: process.env.AnimeDB,
     }
 });
 
@@ -110,8 +110,23 @@ export async function ServerSideRequests_anime(requestType, requestParam){
     let response = {status: 0, statusText: ''};
     switch(requestType){
 
+        case 'getAnimeForMetadata':{
+            let sql = 'SELECT `anime_name`,`anime_season`,`anime_type` FROM `anime_table` WHERE `id` = ' + database.escape(requestParam.id);
+            let query_result = await database.query(sql);
+            if(query_result.length>0){
+                response.status = 200;
+                response.statusText = 'OK!';
+                response.values = query_result;
+            }
+            else{
+                response.status = 404;
+                response.statusText = 'Not found';
+            }
+            break;
+        }
         case 'getAnimeByID':{
             let sql = 'SELECT `id`,`anime_name`,`anime_season` FROM `anime_table` WHERE `id` in ?' ;
+            console.log("the sql was: ", sql);
             let values = [requestParam.animeIDs.map((value)=>value.id)];
             let query_result = await database.query(sql,[values]);
             response.values = query_result;

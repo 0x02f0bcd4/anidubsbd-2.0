@@ -1,4 +1,5 @@
 import GithubProvider from 'next-auth/providers/github';
+import GoogleProvider from 'next-auth/providers/google';
 import { ServerSideRequests_user } from '../../user_DBAP/route';
 
 export const options = { 
@@ -7,6 +8,10 @@ export const options = {
             clientId: process.env.GITHUB_ID,
             clientSecret: process.env.GITHUB_SECRET
         }),
+        GoogleProvider({
+            clientId: process.env.GOOGLE_ID,
+            clientSecret: process.env.GOOGLE_SECRET
+        })
     ], 
 
     callbacks:{ 

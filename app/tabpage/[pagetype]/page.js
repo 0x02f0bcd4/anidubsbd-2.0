@@ -3,6 +3,55 @@ import HeaderClient from "@/components/search/header_client";
 import { redirect } from "next/navigation";
 import style from './tabpage.module.css';
 
+export async function generateMetadata({params}){
+    let pagename = undefined;
+    switch(params.pagetype){
+        case 'trending':
+        {
+            pagename = 'Trending';
+            break;
+        }
+        case 'newest':{
+            pagename = 'Newest';
+            break;
+        }
+        case 'bdub':{
+            pagename = 'Bangla dubbed';
+            break;
+        }
+        case 'bsub':{
+            pagename = 'Bangla subbed';
+            break;
+        }
+        case 'edub':{
+            pagename = 'English dubbed';
+            break;
+        }
+    } 
+
+    if(pagename){
+        //if a valid pagename is set
+        return {
+            title: `${pagename} anime`,
+            description: `Watch all the ${pagename} anime on AniDubsBD`,
+            openGraph:{
+                title: `${pagename} anime`,
+                description: `Watch all the ${pagename} anime on AniDubsBD`
+            }
+        }
+    }
+
+    return {
+        title: 'Error',
+        description: `No such page found`,
+        openGraph:{
+            title: `Error`,
+            description: `No such page found`
+        }
+    }
+}
+
+
 export default async function Page({params}){
 
     params.pagetype = params.pagetype.toLowerCase();

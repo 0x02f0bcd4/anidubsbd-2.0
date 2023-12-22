@@ -12,11 +12,11 @@ import Login from "../Login";
 
 export default function HeaderClient(){
     const [showHamburger,setShowHamburger] = useState(false);
-	return(
+	return( 
 		<>
 		<header className={styles.headerHome}>
 			<a href='/' className={styles.logo}>
-      		  	<Image src={Logo} alt="logo" style={{maxWidth: '100%', maxHeight: '100%'}}/>
+      		  	<Image src={Logo} alt="logo" style={{objectFit: "contain", aspectRatio: '2/1', maxWidth: '100%', height: '100%'}}/>
 			</a>
         	<div className={styles.searchbarHome}>
 				<Search/>

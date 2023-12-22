@@ -11,7 +11,7 @@ const database = mysql({
         port: 3306,
         user: "anidubs1_admins",
         password: "4N4dm1nP455W0RDth4t1550H4RD",
-        database: "users"
+        database: process.env.UserDB
     }
 });
 
@@ -156,6 +156,7 @@ export async function GET(req){
                     let query_result = await database.query(sql,[values]);
                     console.log('the insertion query_result was: ', query_result);
                     sql = 'SELECT `id` FROM `users` WHERE `email` = ' + database.escape(email);
+                    sql = 'SELECT `id` FROM `users` WHERE `id` = LAST_INSERT_ID()';
                     query_result = await database.query(sql);
                     console.log('the SELECT id query_result was :', query_result);
                     //since the user insertion succeeded, we are going to create a new watchlist table

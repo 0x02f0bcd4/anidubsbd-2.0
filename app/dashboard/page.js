@@ -3,19 +3,34 @@ import { getServerSession } from "next-auth";
 import { ServerSideRequests_user } from "../api/user_DBAP/route";
 import HeaderClient from "@/components/search/header_client";
 import styles from './dashboard.module.css';
+
+
+//now, let the robot not to index, or come to this page
+export const metadata = {
+ robots: {
+    index: false,
+    follow: true,
+    nocache: true,
+    googleBot: {
+      index: false,
+      follow: false,
+      noimageindex: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+};
+
+
 export default async function Page(){
     //get the session result
-    console.log("we are good up until this part(before getServerSession): ");
     const session = await getServerSession(options);
     console.log("the session is: ", session);
-
-    //check if the user exists in the database
-    console.log("we are good up until this part: ");
     if(session.verified === true){
         //the user was found, show the data
         //get the watchlist
         const watchlist = await ServerSideRequests_user('getWatchlist',{userID: session.user.userID});
-        console.log('watchlists are: ', watchlist);
         const dataArray = [{name: 'UserID',value: session.user.userID},{name: 'Username', value: session.user.username}
                           ,{name: 'Email',value: session.user.email},{name: 'Authenticated using', value: session.provider.toUpperCase()}];
         return (

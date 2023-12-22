@@ -1,6 +1,18 @@
 import { ServerSideRequests_anime } from "@/app/api/db_ap/route";
 import HeaderClient from "@/components/search/header_client";
 import styles from "../../tabpage/[pagetype]/tabpage.module.css";
+
+
+export async function generateMetadata({params}){
+    return {
+        title: `${params.genretype} genre`,
+        description: `View all the anime tagged having ${params.genretype} genre`,
+        openGraph:{
+            title: `${params.genretype} genre`,
+            description: `View all the anime tagged having ${params.genretype} genre` 
+        }
+    }
+}
 export default async function Page({params}){
     let requestParam = {
         genre_name: params.genretype.toLowerCase()
