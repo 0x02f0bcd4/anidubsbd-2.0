@@ -2,10 +2,10 @@ import mysql from 'serverless-mysql';
 import {writeFile} from 'fs/promises';
 const database = mysql({
     config: {
-        host: '127.0.0.1',
-        port: 3306,
-        user: 'anidubs1_admins',
-        password: "4N4dm1nP455W0RDth4t1550H4RD",
+        host: 'mysql-anidubsbd-anidubsbd.a.aivencloud.com',
+        port: 15331,
+        user: 'avnadmin',
+        password: "AVNS_AJYlibDVEUBKs-ERcpe",
         database: process.env.AnimeDB,
     },
     library: require('mysql2')
@@ -96,7 +96,7 @@ async function getInfos(id){
 	
     	returnStruct.values.anime_genres = query_result.map(value=>value.genre_name);
     	//get the anime name
-    	sql = 'SELECT `id`,`anime_name`,`anime_season` FROM `anidubsbd`.`anime_table` WHERE `id` IN (SELECT `anime_id` FROM `anidubsbd`.`anime_genre` WHERE `genre_id` IN (' + genre_ids + ')) ORDER BY `priority`,`anime_totalview` DESC LIMIT 6';
+    	sql = 'SELECT `id`,`anime_name`,`anime_season` FROM `'+ process.env.AnimeDB+'`.`anime_table` WHERE `id` IN (SELECT `anime_id` FROM `'+ process.env.AnimeDB +'`.`anime_genre` WHERE `genre_id` IN (' + genre_ids + ')) ORDER BY `priority`,`anime_totalview` DESC LIMIT 6';
     	query_result = await database.query(sql);
     	returnStruct.see_more = query_result;
     	returnStruct.values.genre_id = null; 
@@ -146,7 +146,7 @@ export async function ServerSideRequests_anime(requestType, requestParam){
             let query_result = await database.query(sql);
             if(query_result[0]){
                 //the genre id was found
-                sql = `SELECT \`anidubsbd\`.\`anime_table\`.\`id\`,\`anime_name\`,\`anime_season\` FROM \`anidubsbd\`.\`anime_table\` INNER JOIN \`anidubsbd\`.\`anime_genre\` ON \`anime_id\`=\`anidubsbd\`.\`anime_table\`.\`id\` AND \`genre_id\` = ` + query_result[0].id;
+                sql = `SELECT \`${process.env.AnimeDB}\`.\`anime_table\`.\`id\`,\`anime_name\`,\`anime_season\` FROM \`${process.env.AnimeDB}\`.\`anime_table\` INNER JOIN \`${process.env.AnimeDB}\`.\`anime_genre\` ON \`anime_id\`=\`${process.env.AnimeDB}\`.\`anime_table\`.\`id\` AND \`genre_id\` = ` + query_result[0].id;
                 query_result = await  database.query(sql);
                 response.status = 200;
                 response.statusText = 'OK';
@@ -201,7 +201,7 @@ export async function ServerSideRequests_anime(requestType, requestParam){
         }
         case 'verifyAnime':{
             response.values = {};
-            let sql = 'SELECT `id`, `anime_name`, `anime_season` FROM `anidubsbd`.`anime_table` WHERE `id`= ' +database.escape(requestParam.animeID);
+            let sql = 'SELECT `id`, `anime_name`, `anime_season` FROM `'+process.env.AnimeDB+'`.`anime_table` WHERE `id`= ' +database.escape(requestParam.animeID);
             let query_result = await database.query(sql);
             response.values = {...query_result[0]};
             if(response.values.exists = Boolean(query_result[0])){
@@ -210,7 +210,7 @@ export async function ServerSideRequests_anime(requestType, requestParam){
                 query_result = await database.query(sql);
                 //make the genre array
                 let genre_ids = (query_result.map((value)=>value.genre_id)).join();
-                sql = 'SELECT `id`,`anime_name`,`anime_season` FROM `anidubsbd`.`anime_table` WHERE `id` IN (SELECT `anime_id` FROM `anidubsbd`.`anime_genre` WHERE `genre_id` IN (' + genre_ids + ')) ORDER BY `priority`,`anime_totalview` DESC LIMIT 6';
+                sql = 'SELECT `id`,`anime_name`,`anime_season` FROM `' + process.env.AnimeDB + '`.`anime_table` WHERE `id` IN (SELECT `anime_id` FROM `'+process.env.AnimeDB+'`.`anime_genre` WHERE `genre_id` IN (' + genre_ids + ')) ORDER BY `priority`,`anime_totalview` DESC LIMIT 6';
                 query_result = await Promise.all([doQueryByField(`anime_${requestParam.animeID}_watchdetails`,['*']),database.query(sql)]);
                 response.values.episode_list = query_result[0];
                 response.values.see_more = query_result[1];
@@ -220,7 +220,7 @@ export async function ServerSideRequests_anime(requestType, requestParam){
         case 'verifyAnimeAndEpisode':{
             response.status = 404;
             response.statusText = 'not found';
-            if((await doesTableExists('anidubsbd',`anime_${requestParam.animeID}_watchdetails`))){
+            if((await doesTableExists(process.env.AnimeDB,`anime_${requestParam.animeID}_watchdetails`))){
                 //the table exists now check if the episode exists
                 let sql = `SELECT \`id\` FROM \`anime_${requestParam.animeID}_watchdetails\` WHERE \`id\` = ${requestParam.episodeID}`;
                 const query_result = await database.query(sql);
@@ -299,13 +299,10 @@ export async function GET(req,res){
                 const animeID = parseInt(url.searchParams.get('animeID'));
                 const episodeID = parseInt(url.searchParams.get('episodeID'));
                 if(animeID && episodeID){
-                    /*let sql = `SELECT \`name\`,\`comment\` FROM \`anidubsbd\`.\`anime_${animeID}_comments\` INNER JOIN `+ 
-                    ` \`users\`.\`users\` ON \`anidubsbd\`.\`anime_${animeID}_comments\`.\`user_id\` = \`users\`.\`users\`.\`id\` `+ 
-                    ` WHERE \`anidubsbd\`.\`anime_${animeID}_comments\`.\`anime_episode\` = ${episodeID}`;*/
-                    let sql = `SELECT \`username\`,\`comment\` FROM \`anidubsbd\`.\`anime_comments\` INNER JOIN \`users\`.\`users\` ON `+
-                    `\`anidubsbd\`.\`anime_comments\`.\`user_id\` = \`users\`.\`users\`.\`id\` WHERE` + 
-                    ` \`anidubsbd\`.\`anime_comments\`.\`anime_id\` = ${animeID} AND` +
-                    ` \`anidubsbd\`.\`anime_comments\`.\`episode_id\` = ${episodeID}`;
+                    let sql = `SELECT \`username\`,\`comment\` FROM \`${process.env.AnimeDB}\`.\`anime_comments\` INNER JOIN \`${process.env.UserDB}\`.\`users\` ON `+
+                    `\`${process.env.AnimeDB}\`.\`anime_comments\`.\`user_id\` = \`${process.env.UserDB}\`.\`${process.env.UserDB}\`.\`id\` WHERE` + 
+                    ` \`${process.env.AnimeDB}\`.\`anime_comments\`.\`anime_id\` = ${animeID} AND` +
+                    ` \`${process.env.AnimeDB}\`.\`anime_comments\`.\`episode_id\` = ${episodeID}`;
                     resultJSON.values = await database.query(sql);
                     response = new Response(JSON.stringify(resultJSON)); 
                 }

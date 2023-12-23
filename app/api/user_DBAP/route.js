@@ -1,16 +1,14 @@
 import mysql from "serverless-mysql";
-import bcrypt from "bcrypt";
-import {sha256} from "js-sha256";
 import { getServerSession } from "next-auth";
 import { options } from "../auth/[...nextauth]/option";
 import { ServerSideRequests_anime } from "../db_ap/route";
 import { cookies } from "next/headers";
 const database = mysql({
     config:{
-        host: "127.0.0.1",
-        port: 3306,
-        user: "anidubs1_admins",
-        password: "4N4dm1nP455W0RDth4t1550H4RD",
+        host: 'mysql-anidubsbd-anidubsbd.a.aivencloud.com',
+        port: 15331,
+        user: "avnadmin",
+        password: "AVNS_AJYlibDVEUBKs-ERcpe",
         database: process.env.UserDB
     },
     library: require("mysql2")
@@ -158,7 +156,7 @@ export async function GET(req){
                     sql = 'SELECT `id` FROM `users` WHERE `id` = LAST_INSERT_ID()';
                     query_result = await database.query(sql);
                     //since the user insertion succeeded, we are going to create a new watchlist table
-                    sql = 'CREATE TABLE `users`.`' + `user_${query_result[0].id}_watchlist` + '` (`id` INT NOT NULL, PRIMARY KEY (`id`));'
+                    sql = 'CREATE TABLE `'+ process.env.UserDB +'`.`' + `user_${query_result[0].id}_watchlist` + '` (`id` INT NOT NULL, PRIMARY KEY (`id`));'
                     query_result = await database.query(sql);
                     response = new Response('the insertion was success',{status: 200, statusText: 'OK'});
                 }
