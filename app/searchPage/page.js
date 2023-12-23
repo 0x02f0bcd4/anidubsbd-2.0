@@ -15,7 +15,7 @@ export default async function SearchPage({searchParams}){
         );
     }
 
-    const result = await fetch(`http://127.0.0.1:3000/api/db_ap?param=search&name=${paramResult}`, {
+    const result = await fetch(`${process.env.baseURL}/api/db_ap?param=search&name=${paramResult}`, {
         next:{
             revalidate: 60,
     }});
