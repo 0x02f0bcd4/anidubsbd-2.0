@@ -6,9 +6,9 @@ import { cookies } from "next/headers";
 const database = mysql({
     config:{
         host: 'mysql-anidubsbd-anidubsbd.a.aivencloud.com',
-        port: 15331,
+        port: 15327,
         user: "avnadmin",
-        password: "AVNS_AJYlibDVEUBKs-ERcpe",
+        password: 'AVNS_izNsS3r71KRaC-GQonM', 
         database: process.env.UserDB
     },
     library: require("mysql2")
