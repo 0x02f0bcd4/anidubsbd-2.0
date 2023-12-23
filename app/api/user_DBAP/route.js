@@ -5,10 +5,10 @@ import { ServerSideRequests_anime } from "../db_ap/route";
 import { cookies } from "next/headers";
 const database = mysql({
     config:{
-        host: 'mysql-anidubsbd-anidubsbd.a.aivencloud.com',
-        port: 15327,
-        user: "avnadmin",
-        password: 'AVNS_izNsS3r71KRaC-GQonM', 
+        host: process.env.mysqlHost,
+        port: process.env.mysqlPort,
+        user: process.env.mysqlUser,
+        password: process.env.mysqlPassword, 
         database: process.env.UserDB
     },
     library: require("mysql2")

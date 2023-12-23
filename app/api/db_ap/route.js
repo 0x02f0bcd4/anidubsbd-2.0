@@ -1,10 +1,10 @@
 import mysql from 'serverless-mysql';
 const database = mysql({
     config: {
-        host: 'mysql-anidubsbd-anidubsbd.a.aivencloud.com',
-        port: 15327,
-        user: 'avnadmin',
-        password: "AVNS_izNsS3r71KRaC-GQonM",
+        host: process.env.mysqlHost,
+        port: process.env.mysqlPort,
+        user: process.env.mysqlUser,
+        password: process.env.mysqlPassword,
         database: process.env.AnimeDB,
     },
     library: require('mysql2')
