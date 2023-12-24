@@ -39,7 +39,7 @@ export default async function Page({params}){
                     response.values.map((value,index) =>{
                         let fullname = value.anime_name + (value.anime_season?' '+value.anime_season:'');
                         return (
-                            <a className={styles.tabpage_item} href={`/anime/${value.id}`} key={fullname}>
+                            <a className={styles.tabpage_item} href={`/animeInfo?id=${value.id}`} key={fullname}>
                                 <img src={`/Posters/${fullname} Poster.jpg`} alt={fullname}/>
                                 <span>{fullname}</span>
                             </a>
