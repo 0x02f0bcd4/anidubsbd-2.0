@@ -69,7 +69,8 @@ async function doQueryLikeField(table_name,columns,field, short,order_list){
         order_sql = ' ORDER BY' + ((order_list.map((value)=>{return orderToString(value)})).join());
     }
     let sql = `SELECT ${columns.join()} FROM \`${table_name}\`` + (field && field.name && field.value? 
-        ` WHERE \`${field.name}\` LIKE "%` + sanitizeLIKE(field.value) + "%\"": "") + order_sql +(short && short!==0?` LIMIT ${short}`: "");
+        ` WHERE \`${field.name}\` LIKE '%` + sanitizeLIKE(field.value) + "%'": "") + order_sql +(short && short!==0?` LIMIT ${short}`: "");
+    console.log("The doQueryLikeField sql is: ", sql);
     let query_result = await database.query(sql);
     return query_result;
 }

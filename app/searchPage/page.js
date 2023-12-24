@@ -15,7 +15,9 @@ export default async function SearchPage({searchParams}){
         );
     }
 
-    const result = await fetch(`${process.env.baseURL}/api/db_ap?param=search&name=${paramResult}`, {
+    const request = `${process.env.baseURL}api/db_ap?param=search&name=${paramResult}`;
+    console.log("the request is: ", request);
+    const result = await fetch(request, {
         next:{
             revalidate: 60,
     }});
