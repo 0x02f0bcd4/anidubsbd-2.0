@@ -175,7 +175,7 @@ export default function Page(){
     
     //if it was none of the cases, then it means that fetching is done and the data is already here
     const handleEpisodeChange = (event)=>{
-        const newEpisode = event.target.getAttribute('episode-number');
+        const newEpisode = event.target.getAttribute('enumber');
         setCurrentEpisode(parseInt(newEpisode));
     };
 
@@ -199,8 +199,8 @@ export default function Page(){
                         episodeList.values.episode_list.map((value,index)=>{ 
 
                             return (
-                                <li className={styles.viewpage_episode_list_item} key={index} onClick={handleEpisodeChange} episode-number={index}>
-                                    <a href={value.episode_url} onClick={handlePreventingRedirecing}><p>{index+1} . {value.episode_name}</p></a>
+                                <li className={styles.viewpage_episode_list_item} key={index} onClick={handleEpisodeChange} enumber={index}>
+                                    <a href={value.episode_url} onClick={handlePreventingRedirecing} enumber={index}><p enumber={index}>{index+1} . {value.episode_name}</p></a>
                                 </li>
                             )
                         })
