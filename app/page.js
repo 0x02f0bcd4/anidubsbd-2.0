@@ -13,17 +13,36 @@ function LoadTabs({type, catchPhrase, reverse}){
 	const scrollShowRef = useRef(); 
 	const scrollWidthRef = useRef();
 	const scrollbarRef = useRef();
+	let tabname = undefined;
 	const [tabContents,setTabContents] = useState({empty: true});
 	useEffect(()=>{
 		const fetchCall = async () =>{		
 
-			const response = await fetch(`/api/db_ap?param=${type}&short=10`);
+			const response = await fetch(`/api/db_ap?param=${type}&short=7`);
 			const json = await response.json();
 			setTabContents({empty: false, values: json.values});
 		}
 
 		fetchCall();
 	},[]);
+
+
+	switch(type){
+		case 'trending':
+			tabname = 'জনপ্রিয় অ্যানিমে';
+			break;
+		case 'newest':
+			tabname = 'নতুন অ্যানিমে';
+			break;
+		case 'bdub':
+			tabname = 'বাংলা ডাব';
+			break;
+		case 'bsub':
+			tabname = 'বাংলা সাব';
+			break;
+		case 'edub':
+			tabname = 'ইংলিশ ডাব';
+	}
 
 	if(tabContents===null){
 		return <h3>ট্যাবের কন্টেন্ট খুঁজে পাওয়া যায়নি</h3>;
@@ -109,7 +128,7 @@ function LoadTabs({type, catchPhrase, reverse}){
 				}
 
 				<a href={`/tabpage/${type}`} className="whitespace-wrap overflow-hidden rounded border border-cyan-400 border-solid flex sm:inline-flex flex-row justify-center items-center m-2 h-[15dvh] sm:align-top sm:w-[150px] sm:h-full sm:m-0">
-					<p className="w-full text-center whitespace-normal">Continue Watching</p>
+					<p className="w-full text-center text-xl whitespace-normal">আরো {tabname} দেখুন </p>
 				</a>
 			</div>
 			<div className="hidden lg:inline-flex flex-col justify-around w-[8%]" style={scrollbarRef.current && scrollbarRef.current.scrollWidth===scrollbarRef.current.clientWidth?{display: "none"}:{}}>
