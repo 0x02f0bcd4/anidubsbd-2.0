@@ -1,4 +1,3 @@
-import BodyStyle from "./bodystyle.module.css";
 import './globals.css'
 import Provider from '@/components/Providers';
 
@@ -13,10 +12,11 @@ export const metadata = {
 }
 
 export default function RootLayout({ children }) {
+  const year = new Date();
   return (
     <html lang="en">
 
-      <body className={BodyStyle.body}>
+      <body className='font-body'>
         <Provider>
             {children}
         </Provider>

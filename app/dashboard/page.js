@@ -29,14 +29,14 @@ export default async function Page(){
     if(session.verified === true){
         //the user was found, show the data
         //get the watchlist
-        const watchlist = await ServerSideRequests_user('getWatchlist',{userID: session.user.userID});
+        const watchlist = await ServerSideRequests_user('getWatchlist',{userID: session.user.userID}); 
         const dataArray = [{name: 'UserID',value: session.user.userID},{name: 'Username', value: session.user.username}
                           ,{name: 'Email',value: session.user.email},{name: 'Authenticated using', value: session.provider.toUpperCase()}];
         return (
             <>
                 <HeaderClient/>
-                <div className={styles.dashboard}>
-                    <h2>User information</h2>
+                <div className="mt-4 mx-2 rounded border border-slate-400">
+                    <h2 className="text-xl border-b border-slate-400 mx-4 text-center mt-1">User information</h2>
                     <div>
                         {
                             dataArray.map((value)=>{
@@ -49,29 +49,25 @@ export default async function Page(){
                             })
                         }
                     </div>
-                    <a href='/api/auth/signout'>Signout</a>
+                    <p className="text-center p-2 mb-1"><a href='/api/auth/signout' className="p-2 bg-slate-900 rounded m-2 text-center text-xl text-red-500">Signout</a></p>
                 </div> 
-            <div className={styles.watchlist_tab}>
-            	<div className={styles.title}>
-                	<h2>Watchlist</h2>
-            	</div>
+            <div className="mx-auto w-98vw my-4">	
+                <h2 className="mx-2 text-center border-b border-slate-400 text-xl text-cyan-400">Watchlist</h2>
             	{
-                    watchlist.status === 200?(
-            		    <div className={styles.cards}>
-                			<div className={styles.items}>
-                    			{
-                        			watchlist.values.map((value) => {
-                                        let fullname = value.anime_name + (value.anime_season?' '+value.anime_season:value.anime_season);
-                            			return (
-                                			<a className={styles.item_div} key={value.id} href={`/animeInfo?id=${value.id}`}>
-                                    			<img src={`/Posters/${fullname} Poster.jpg`} alt={fullname}/>
-                                    			<span className="anime_name">{fullname}</span>
-                                			</a>
-                            			)
-                        			})
-                    			}
-                			</div>
-            			</div>
+                    watchlist.status === 200?(	
+                        <div className="my-2 min-[550px]:flex flex-row justify-center flex-wrap gap-2"> 
+                            {
+                                watchlist.values.map((value)=>{
+                                    let fullname = value.anime_name + (value.anime_season?" "+value.anime_season:"");
+                                    return (
+                                        <a key={value.id} href={`/animeInfo?id=${value.id}`} className="border border-slate-400 rounded flex flex-row min-[550px]:flex-col min-[550px]:justify-between items-center p-1 my-2 h-[20dvh] min-[550px]:max-w-[150px] min-[550px]:h-[250px]">
+                                            <img className="h-full pl-2 min-[550px]:pl-0 min-[550px]:max-w-full min-[550px]:max-h-[85%]" src={`/Posters/${fullname} Poster.jpg`} alt={`Poster of ${fullname}`}/>
+                                            <p className="text-lg pl-2 whitespace-nowrap overflow-hidden text-ellipsis min-[550px]:w-[80%]">{fullname}</p>
+                                        </a>
+                                    );
+                                })
+                            }
+                        </div>
                     ):
                     (
                         <h2>কিছু দেখলে না বলতে পারবো যে কি কি দেখেছেন  :-)</h2>
@@ -79,6 +75,7 @@ export default async function Page(){
             	}
            	 
         	</div>
+
             </>
         );
     }
@@ -86,7 +83,7 @@ export default async function Page(){
     return (
         <>
             <HeaderClient/>
-            <h2>You still haven&apos;t completed your signing in process. Visit <a href="/welcome" style={{textDecoration: "none", color: 'orangered'}}>here to complete your signing up process</a></h2>
+            <h2 className="w-[98vw] mx-auto mt-4 text-xl">You still haven&apos;t completed your signing in process. Visit <a href="/welcome" className="text-cyan-400">here to complete your signing up process.</a></h2>
         </>
     ); 
 }

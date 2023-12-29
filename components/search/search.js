@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import styles from "./search.module.css";
-function Search({onLowerDevice}) {
+
+
+function Search() {
     const [formField,setFormField] = useState('');
     const [currentSearchTerm,setCurrentSearchTerm] = useState('');
     const [searchResults,setsearchResults] = useState([]);
     useEffect(()=>{
-        //if not on lower resolution device, fetch search result(we are still not done yet, keep reading)
-        if(!onLowerDevice){
             const fetchSearchResult = async()=>{
                 if(formField.length>0){
                     if(currentSearchTerm.length===0){
@@ -26,7 +25,6 @@ function Search({onLowerDevice}) {
             }
 
             fetchSearchResult();
-        }
     },[formField]);
 
     const handleChange = (event)=>{
@@ -36,26 +34,25 @@ function Search({onLowerDevice}) {
 
     //if on lower resolution device, no need to show immediate result
   return (
-    <form className={styles.searchbar} action="/searchPage" method="get">
-        <input type="text" name="name" placeholder='অ্যানিমে খুঁজুন' value={formField} onChange={handleChange} autoComplete="off"/>
-
-        <div className={styles.searchResult}>
-            <div className={styles.items}>
+    <> 
+    <form className="rounded-xl overflow-hidden w-full h-full" action="/searchPage" method="get">
+        <input type="text" name="name" placeholder='অ্যানিমে খুঁজুন' value={formField} onChange={handleChange} autoComplete="off" className="focus:outline-none w-full h-full bg-slate-900 text-center text-cyan-400 placeholder:text-cyan-400" /> 
+         
+    </form>
+    <div className="mt-2 z-[50] rounded-xl relative flex flex-col bg-slate-400">
             {
-                searchResults.map((value,index)=>{
-                    let fullname = value.anime_name + (value.anime_season?' '+value.anime_season:"");
+                searchResults.map((value)=>{
+                    let fullname = value.anime_name + (value.anime_season? ' '+value.anime_season:'');
                     return (
-                        <a className={styles.item_div} key={value.id} href={`/animeInfo?id=${value.id}`}>
-                            <img src={`/Posters/${fullname} Poster.jpg`} alt={fullname}/>
-                            <span className="anime_name">{fullname}</span>
+                        <a className="pl-2 my-2 w-[90%] flex flex-row items-center" href={`/animeInfo?id=${value.id}`} key={value.id}>
+                            <img className="rounded max-w-[10%]" src={`/Posters/${fullname} Poster.jpg`} alt={`Poster for ${fullname}`}/>
+                            <p className="text-slate-900 pl-2">{fullname}</p>
                         </a>
-                    );
-                    
+                    )
                 })
             }
-            </div>
-        </div>
-    </form>
+    </div>
+    </>
   )
 }
 

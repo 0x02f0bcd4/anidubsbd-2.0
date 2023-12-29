@@ -60,13 +60,13 @@ function LoadComment({animeID,episodeID})
     useEffect(()=>{
         if(userSession.status === 'unauthenticated'){
             //the user isn't logged in
-            setPostCommentJSX((<h2><a href='/api/auth/signin' style={{textDecoration:"none", color: 'orange'}}>Login</a> to post comment</h2>));
+            setPostCommentJSX((<h2 className="text-xl"><a href='/api/auth/signin' className="pl-2 text-cyan-400 text-2xl">Login</a> to post comment</h2>));
         }
         else if(userSession.status === 'authenticated'){ 
             setPostCommentJSX((
-                    <form className={styles.commentbox} onSubmit={handleCommentSubmit}>
-                        <textarea minLength={2} maxLength={2000} autoComplete="off" episode-number={episodeID} placeholder="Insert your comment" ref={commentRef}/>
-                        <button onClick={handleCommentSubmit}>POST!</button>
+                    <form className="rounded flex flex-col justify-around relative mx-auto w-[98%] h-full bg-slate-900" onSubmit={handleCommentSubmit}>
+                        <textarea className="p-1 focus:outline-none focus:border border-solid border-cyan-400 resize-none rounded placeholder:text-center bg-slate-900 text-slate-300 w-full h-[70%]" minLength={2} maxLength={2000} autoComplete="off" episode-number={episodeID} placeholder="Insert your comment" ref={commentRef}/>
+                        <button className="text-slate-900 px-2 w-fit rounded bg-slate-400"onClick={handleCommentSubmit}>POST!</button>
                     </form>
             ));
         }
@@ -188,68 +188,54 @@ export default function Page(){
         <>
             <HeaderClient/>
             
-            <p className={styles.anime_title}><span className={styles.watching}>আপনি দেখছেন </span><span className={styles.anime_ep_name}>{animeName}</span></p>
-            <p className={styles.episode_title}><span className={styles.watching}>পর্ব </span><span className={styles.anime_ep_name}>{episodeList.values.episode_list[currentEpisode].episode_name}</span></p>
-            <div className={styles.ViewPort}>
-                <iframe src={episodeList.values.episode_list[currentEpisode].episode_url} allowFullScreen="allowfullscreen">
+            <p className="text-xl text-center mt-4"><span className="text-white text-2xl">আপনি দেখছেন </span><span className="text-cyan-400">{animeName}</span></p>
+            <p className="text-xl text-center mt-2"><span className="text-white text-2xl">পর্ব </span><span className="text-cyan-400">{episodeList.values.episode_list[currentEpisode].episode_name}</span></p>
+            <main className="my-4 flex h-auto w-[98vw] lg:h-[80vh] flex-col lg:flex-row justify-around items-center mx-auto">
+                <iframe className="border border-slate-400 rounded w-full lg:w-1/2 lg:h-auto aspect-video" src={episodeList.values.episode_list[currentEpisode].episode_url} allowFullScreen="allowfullscreen">
 
                 </iframe>
-                <ol className={styles.viewpage_episode_list}>
+                <ol className="no_scrollbar w-full max-h-[80vh] mt-2 lg:mt-0 lg:w-1/3 lg:h-auto border border-cyan-400 rounded lg:max-h-[98%] overflow-scroll">
                     {
                         episodeList.values.episode_list.map((value,index)=>{ 
 
                             return (
-                                <li className={styles.viewpage_episode_list_item} key={index} onClick={handleEpisodeChange} enumber={index}>
+                                <li className={"text-cyan-400 p-2 hover:bg-slate-400 hover:text-slate-900"+(index===currentEpisode?" bg-slate-400 text-slate-900": "")} key={index} onClick={handleEpisodeChange} enumber={index}>
                                     <a href={value.episode_url} onClick={handlePreventingRedirecing} enumber={index}><p enumber={index}>{index+1} . {value.episode_name}</p></a>
                                 </li>
                             )
                         })
                     }
                 </ol>
-            </div>
+            </main>
 
             <LoadComment animeID={animeID} episodeID={currentEpisode+1}/>
-            <div className={styles.see_more_tab}>
-                    <div className={styles.title}>
-                        <h3>Even more</h3>
-                    </div>
-                    <div className={styles.cards}>
-                        <div className={styles.items}>
-                           {
-                                episodeList.values.see_more.map((value,index)=>{
-                                    let fullname = value.anime_name + (value.anime_season?" "+value.anime_season:"");
-                                    if(value.id !== episodeList.values.id){
 
-                                        return (
-                                            <a href={`/animeInfo?id=${value.id}`} key={index} className={styles.item_div}>
-                                                <img src={`/Posters/${fullname} Poster.jpg`} alt={`Poster of ${fullname}`}/>
-                                                <span>{fullname}</span>
-                                            </a>
-                                        );
-                                    }
-                                })
-                           } 
-                        </div>
-                    </div>
-		    </div>
-
-        </>
-    );
-    /*return(
-        <>
-            <div>
-                <iframe src={episodeList.values.episode_list[currentEpisode].episode_url}/>
-                <ul>
+            <section className="my-2">
+                <h3 className="text-xl md:text-2xl w-[90%] mx-auto border-b border-white border-solid">Even more</h3>
+                <div className="mx-auto w-[90%] block mt-2 min-[550px]:flex gap-1 flex-row flex-wrap items-center justify-around">
                     {
-                        episodeList.values.episode_list.map((value,index)=>{
-                            return(
-                                <li key={index} episode-number={index} onClick={handleEpisodeChange}>{value.episode_name}</li>
+                        episodeList.values.see_more.map((value,index)=>{
+                            if(value.id!==episodeList.values.id)
+                            {
+                                let fullname = value.anime_name + (value.anime_season?" "+value.anime_season:"");
+                                
+                                return (
+                                    <a className="border border-slate-500 border-solid rounded items-center my-2 h-[20dvh] max-h-[100px] min-[550px]:h-[250px] min-[550px]:max-h-[250px] flex flex-row min-[550px]:flex-col w-[95%] min-[550px]:w-[150px] mx-auto min-[550px]:m-0 min-[550px]:p-2 " key={value.id} href={`/animeInfo?id=${value.id}`}>
+                                        <img className="ml-2 min-[550px]:ml-0 max-w-[15%] h-full min-[550px]:max-w-full " src={`/Posters/${fullname} Poster.jpg`} alt={`Poster of ${fullname}`}/>
+                                        <p className="ml-2 w-[75%] min-[550px]:w-[90%] overflow-hidden whitespace-nowrap
+                                         text-ellipsis">{fullname}</p>
+                                    </a>
+                                )
+                            }
+                            return (
+                                <>
+                                </>
                             );
                         })
                     }
-                </ul>
-            </div>
-            <LoadComment animeID={animeID} episodeID={currentEpisode+1}/>
+                </div>
+            </section> 
+
         </>
-    );*/
+    ); 
 }

@@ -70,7 +70,6 @@ async function doQueryLikeField(table_name,columns,field, short,order_list){
     }
     let sql = `SELECT ${columns.join()} FROM \`${table_name}\`` + (field && field.name && field.value? 
         ` WHERE \`${field.name}\` LIKE '%` + sanitizeLIKE(field.value) + "%'": "") + order_sql +(short && short!==0?` LIMIT ${short}`: "");
-    console.log("The doQueryLikeField sql is: ", sql);
     let query_result = await database.query(sql);
     return query_result;
 }
@@ -279,17 +278,18 @@ export async function GET(req,res){
             case 'edub':
             {
                 const param = url.searchParams.get('param');
+                const short = url.searchParams.get('short');
                 if(param ==='trending'){
                     //if it's the nigga in the hood, don't send any other nigga
-                    resultJSON.values = await doQueryByField('anime_table',['id','anime_name','anime_season'],null,6,[{name: 'priority', order: 'ASC'},{name: 'anime_totalview', order: 'DESC'}]);
+                    resultJSON.values = await doQueryByField('anime_table',['id','anime_name','anime_season'],null,short,[{name: 'priority', order: 'ASC'},{name: 'anime_totalview', order: 'DESC'}]);
                 }
                 else if( param ==='newest')
                 {
-                    resultJSON.values = await doQueryByField('anime_table',['id','anime_name','anime_season'],null,6,[{name: 'priority', order: 'ASC'},{name: 'anime_insertion_date', order: 'DESC'}]);
+                    resultJSON.values = await doQueryByField('anime_table',['id','anime_name','anime_season'],null,short,[{name: 'priority', order: 'ASC'},{name: 'anime_insertion_date', order: 'DESC'}]);
                 }
                 else{
 
-                    resultJSON.values = await doQueryByField('anime_table',['id','anime_name','anime_season'],{name: 'anime_type', value: param},6,[{name: 'priority', order: 'ASC'}, {name: 'anime_totalview', order: 'DESC'}]);
+                    resultJSON.values = await doQueryByField('anime_table',['id','anime_name','anime_season'],{name: 'anime_type', value: param},short,[{name: 'priority', order: 'ASC'}, {name: 'anime_totalview', order: 'DESC'}]);
                 }
                 
                 response = new Response(JSON.stringify(resultJSON));

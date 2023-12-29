@@ -2,7 +2,6 @@
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import { useState, useRef } from "react";
-import styles from './welcome.module.css';
 export default function Page(){
     const session = useSession();
     const usernameRef = useRef();
@@ -76,19 +75,19 @@ export default function Page(){
 
     return (
         <>
-            <h2>AniDubsBD এ আপনাকে স্বাগতম । আপনাকে এক্যাউন্টটি তৈরি করতে একটি ইউজারনেম পছন্দ করতে হবে। আপনি পরবর্তীতে আপনার ইউজারনেমটি পরিবর্তন করতে পারবেন না ।</h2>
-            <h2>প্রথমে সিদ্ধান্ত নিন, তারপর &apos;অর্ডার করুন&apos; বাটনে ক্লিক করুন</h2>
-            <h4 style={isAvailable.status === 'notdecided'?{display: 'block'}:{display: 'none'}}>অনুগ্রহপূর্বক একটি ইউজারনেম নিচের ছকটিতে লিখুন</h4>
-            <h4 style={showLengthError?{display: 'block',color: 'red'}:{display: 'none'}}>আপনার ইউজারনেমটি অন্তত পাঁচ বর্ণের হতে হবে</h4>
-            <h4 style={isAvailable.status==='notavailable'?{display: 'block', color: 'red'}:{display: 'none'}}>এই ইউজারনেমটি ইতোমধ্যে অন্য একজন ব্যক্তি নিয়েছে</h4>
-            <h4 style={isAvailable.status === 'available'?{display:'block', color: 'green'}:{display: 'none'}}>এই ইউজারনেমটি নেয়া যেতে পারে</h4>
+            <h2 className="text-xl">AniDubsBD এ আপনাকে স্বাগতম । আপনাকে এক্যাউন্টটি তৈরি করতে একটি ইউজারনেম পছন্দ করতে হবে। আপনি পরবর্তীতে আপনার ইউজারনেমটি পরিবর্তন করতে পারবেন না ।</h2>
+            <h2 className="text-xl">প্রথমে সিদ্ধান্ত নিন, তারপর &apos;অর্ডার করুন&apos; বাটনে ক্লিক করুন</h2>
+            <h4 className="text-lg" style={isAvailable.status === 'notdecided'?{display: 'block'}:{display: 'none'}}>অনুগ্রহপূর্বক একটি ইউজারনেম নিচের ছকটিতে লিখুন</h4>
+            <h4 className="text-lg" style={showLengthError?{display: 'block',color: 'red'}:{display: 'none'}}>আপনার ইউজারনেমটি অন্তত পাঁচ বর্ণের হতে হবে</h4>
+            <h4 className="text-lg" style={isAvailable.status==='notavailable'?{display: 'block', color: 'red'}:{display: 'none'}}>এই ইউজারনেমটি ইতোমধ্যে অন্য একজন ব্যক্তি নিয়েছে</h4>
+            <h4 className="text-lg" style={isAvailable.status === 'available'?{display:'block', color: 'green'}:{display: 'none'}}>এই ইউজারনেমটি নেয়া যেতে পারে</h4>
 
-            <fieldset className={styles.choosing}>
-                <legend>ইউজারনেম পছন্দ করুন</legend>
-                <form className={styles.choice_form} onSubmit={(e)=>e.preventDefault()}>
-                    <input type='text' name='checkusername' placeholder="আপনার পছন্দের ইউজারনেমটি লিখুন" ref={usernameRef}/>
-                    <button onClick={handleChecking}>সিদ্ধান্ত নিন</button>
-                    <button onClick={handleSelecting}>অর্ডার করুন</button>
+            <fieldset className="rounded border border-sky-400 text-center">
+                <legend align="center" className="text-lg">ইউজারনেম পছন্দ করুন</legend>
+                <form className="flex flex-col justify-around items-center w-full" onSubmit={(e)=>e.preventDefault()}>
+                    <input className="text-center py-2 w-[90%] text-xl rounded focus:outline-none focus:border focus:border-cyan-300 text-cyan-400 bg-slate-900" type='text' name='checkusername' placeholder="আপনার পছন্দের ইউজারনেমটি লিখুন" ref={usernameRef}/>
+                    <button className="rounded my-2 bg-slate-900 text-2xl p-2" onClick={handleChecking}>সিদ্ধান্ত নিন</button>
+                    <button className="rounded my-2 bg-slate-900 text-2xl p-2" onClick={handleSelecting}>অর্ডার করুন</button>
                 </form>
             </fieldset>
         </>
