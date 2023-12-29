@@ -1,6 +1,6 @@
 Copyright (c) 2003-2023 S.M. Mostofa Himal(0x02f0bcd4)
 
-Permission is hereby granted, free of charge, to any person authorized by the auhor 
+Permission is hereby granted, free of charge, to any person authorized by the author 
 (as listed in https://github.com/0x02f0bcd4/authorized_persons) 
 to obtain a copy of this software and associated documentation files (the "Software"), 
 to deal in the Software without restriction except mentioned ones, including without limitation the rights
