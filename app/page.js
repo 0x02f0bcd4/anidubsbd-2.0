@@ -10,6 +10,7 @@ function calcBarWidth(scrollLeft,scrollWidth,clientWidth){
 
 
 function LoadTabs({type, catchPhrase, reverse}){	
+	const showNavRef = useRef();
 	const scrollShowRef = useRef(); 
 	const scrollWidthRef = useRef();
 	const scrollbarRef = useRef();
@@ -18,7 +19,7 @@ function LoadTabs({type, catchPhrase, reverse}){
 	useEffect(()=>{
 		const fetchCall = async () =>{		
 
-			const response = await fetch(`/api/db_ap?param=${type}&short=7`);
+			const response = await fetch(`/api/db_ap?param=${type}&short=10`);
 			const json = await response.json();
 			setTabContents({empty: false, values: json.values});
 		}
@@ -26,6 +27,11 @@ function LoadTabs({type, catchPhrase, reverse}){
 		fetchCall();
 	},[]);
 
+	useEffect(()=>{
+		console.log("The useEffect has been run, showNavRef.current is: ", showNavRef.current);
+		if(showNavRef.current && scrollbarRef.current.scrollWidth!==scrollbarRef.current.clientWidth)
+			showNavRef.current.style.display='inline-flex';	
+	});
 
 	switch(type){
 		case 'trending':
@@ -99,6 +105,10 @@ function LoadTabs({type, catchPhrase, reverse}){
 
 	window.addEventListener('resize', handleResize);
 
+	if(scrollbarRef.current)
+	{
+		console.log("The type is: ",type, " and the scrollwidth is: ", scrollbarRef.current.scrollWidth, " and the clientWidth is: ", scrollbarRef.current.clientWidth);
+	}
 	return (
 		<section className="my-4">
 			<div className={headerClassName}>
@@ -131,7 +141,7 @@ function LoadTabs({type, catchPhrase, reverse}){
 					<p className="w-full text-center text-xl whitespace-normal">আরো {tabname} দেখুন </p>
 				</a>
 			</div>
-			<div className="hidden lg:inline-flex flex-col justify-around w-[8%]" style={scrollbarRef.current && scrollbarRef.current.scrollWidth===scrollbarRef.current.clientWidth?{display: "none"}:{}}>
+			<div ref={showNavRef} className="hidden flex-col justify-around w-[8%]">
 				<button className="rounded h-1/5 lg:text-lg bg-slate-900 text-cyan-400" onClick={handleNext}>Next</button>
 				<button className="rounded h-1/5 lg:text-lg bg-slate-900 text-cyan-400" onClick={handlePrevious}>Previous</button>
 				<button className="rounded h-1/5 text-lg bg-slate-900 text-cyan-400" onClick={handleEnd}>End</button>
