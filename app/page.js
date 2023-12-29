@@ -28,7 +28,6 @@ function LoadTabs({type, catchPhrase, reverse}){
 	},[]);
 
 	useEffect(()=>{
-		console.log("The useEffect has been run, showNavRef.current is: ", showNavRef.current);
 		if(showNavRef.current && scrollbarRef.current.scrollWidth!==scrollbarRef.current.clientWidth)
 			showNavRef.current.style.display='inline-flex';	
 	});
