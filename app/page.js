@@ -28,7 +28,6 @@ function LoadTabs({type, catchPhrase, reverse}){
 	},[]);
 
 	useEffect(()=>{
-		console.log("invoking render, type: ",type);
 		if(showNavRef.current && window.innerWidth>=1024 && scrollbarRef.current.scrollWidth!==scrollbarRef.current.clientWidth)
 			showNavRef.current.style.display='inline-flex';	
 	});
@@ -103,25 +102,17 @@ function LoadTabs({type, catchPhrase, reverse}){
 
 
 		if(showNavRef.current){
-			console.log("The showNavRef exists");
 			if(window.innerWidth < 1024){
-				console.log("setting the display to have none, as the window.innerWidth is lesser than 1280");
 				showNavRef.current.style.display = 'none';
 			}
 			else{
 
-				console.log("setting the display to have inline-flex, as the window.innerWidth is greater or equal than 1280");
 				showNavRef.current.style.display = 'inline-flex';
 			}
 		}
 	};
 
-	window.addEventListener('resize', handleResize);
-
-	if(scrollbarRef.current)
-	{
-		console.log("The type is: ",type, " and the scrollwidth is: ", scrollbarRef.current.scrollWidth, " and the clientWidth is: ", scrollbarRef.current.clientWidth);
-	}
+	window.addEventListener('resize', handleResize);	
 	return (
 		<section className="my-4">
 			<div className={headerClassName}>
