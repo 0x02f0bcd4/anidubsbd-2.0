@@ -28,7 +28,8 @@ function LoadTabs({type, catchPhrase, reverse}){
 	},[]);
 
 	useEffect(()=>{
-		if(showNavRef.current && scrollbarRef.current.scrollWidth!==scrollbarRef.current.clientWidth)
+		console.log("invoking render, type: ",type);
+		if(showNavRef.current && window.innerWidth>=1024 && scrollbarRef.current.scrollWidth!==scrollbarRef.current.clientWidth)
 			showNavRef.current.style.display='inline-flex';	
 	});
 
@@ -74,11 +75,10 @@ function LoadTabs({type, catchPhrase, reverse}){
 	};	
 
 	const handleScroll = ()=>{
-		if(window.innerWidth>=640 && window.innerWidth<1024 && scrollbarRef.current.scrollWidth!==scrollbarRef.current.clientWidth){
-			//const width = (scrollbarRef.current.scrollLeft / (scrollbarRef.current.scrollWidth-scrollbarRef.current.clientWidth))*100;
+		if(scrollbarRef.current && window.innerWidth>=640 && window.innerWidth<1024 && scrollbarRef.current.scrollWidth!==scrollbarRef.current.clientWidth){
 			const width = calcBarWidth(scrollbarRef.current.scrollLeft, scrollbarRef.current.scrollWidth,scrollbarRef.current.clientWidth);
 			scrollWidthRef.current.style.width = `${width}%`;
-		}
+		}	
 	};	
 
 
@@ -100,7 +100,21 @@ function LoadTabs({type, catchPhrase, reverse}){
 		else{
 			scrollShowRef.current.style.display = 'none';
 		}
-	}
+
+
+		if(showNavRef.current){
+			console.log("The showNavRef exists");
+			if(window.innerWidth < 1024){
+				console.log("setting the display to have none, as the window.innerWidth is lesser than 1280");
+				showNavRef.current.style.display = 'none';
+			}
+			else{
+
+				console.log("setting the display to have inline-flex, as the window.innerWidth is greater or equal than 1280");
+				showNavRef.current.style.display = 'inline-flex';
+			}
+		}
+	};
 
 	window.addEventListener('resize', handleResize);
 
