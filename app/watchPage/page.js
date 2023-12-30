@@ -220,7 +220,7 @@ export default function Page(){
                                 let fullname = value.anime_name + (value.anime_season?" "+value.anime_season:"");
                                 
                                 return (
-                                    <a className="border border-slate-500 border-solid rounded items-center my-2 h-[20dvh] max-h-[100px] min-[550px]:h-[250px] min-[550px]:max-h-[250px] flex flex-row min-[550px]:flex-col w-[95%] min-[550px]:w-[150px] mx-auto min-[550px]:m-0 min-[550px]:p-2 " key={value.id} href={`/animeInfo?id=${value.id}`}>
+                                    <a className="border border-slate-500 border-solid rounded items-center my-2 h-[20svh] max-h-[100px] min-[550px]:h-[250px] min-[550px]:max-h-[250px] flex flex-row min-[550px]:flex-col w-[95%] min-[550px]:w-[150px] mx-auto min-[550px]:m-0 min-[550px]:p-2 " key={value.id} href={`/animeInfo?id=${value.id}`}>
                                         <img className="ml-2 min-[550px]:ml-0 max-w-[15%] h-full min-[550px]:max-w-full " src={`/Posters/${fullname} Poster.jpg`} alt={`Poster of ${fullname}`}/>
                                         <p className="ml-2 w-[75%] min-[550px]:w-[90%] overflow-hidden whitespace-nowrap
                                          text-ellipsis">{fullname}</p>

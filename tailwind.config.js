@@ -5,7 +5,7 @@ module.exports = {
     extend: { 
       spacing:{
         '98vw': '98dvw',
-        '8vh': '8dvh',
+        '8vh': '8svh',
         '30pc': '30%',
         '12%': '12%'
       },

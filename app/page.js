@@ -133,7 +133,7 @@ function LoadTabs({type, catchPhrase, reverse}){
 					tabContents.values.map((value,index)=>{
 						let fullname = value.anime_name + (value.anime_season?" "+value.anime_season:"");
 						return (
-							<a key={value.id} className="overflow-hidden rounded border sm:border-0 border-cyan-400 border-solid m-2 sm:m-0 p-2 flex sm:inline-flex flex-row sm:flex-col sm:justify-between items-center sm:w-[150px] h-[15dvh] sm:h-[225px]" href={`/animeInfo?id=${value.id}`}>
+							<a key={value.id} className="overflow-hidden rounded border sm:border-0 border-cyan-400 border-solid m-2 sm:m-0 p-2 flex sm:inline-flex flex-row sm:flex-col sm:justify-between items-center sm:w-[150px] h-[15svh] sm:h-[225px]" href={`/animeInfo?id=${value.id}`}>
 								<img className="rounded h-full sm:max-w-full sm:h-auto sm:max-h-[80%]" src={`/Posters/${fullname} Poster.jpg`} alt={`Poster of ${fullname}`}/>
 								<p className="pl-2 sm:p-0 sm:w-[80%] sm:text-xl overflow-hidden whitespace-nowrap text-ellipsis">{fullname}</p>
 							</a>
@@ -141,7 +141,7 @@ function LoadTabs({type, catchPhrase, reverse}){
 					})
 				}
 
-				<a href={`/tabpage/${type}`} className="whitespace-wrap overflow-hidden rounded border border-cyan-400 border-solid flex sm:inline-flex flex-row justify-center items-center m-2 h-[15dvh] sm:align-top sm:w-[150px] sm:h-full sm:m-0">
+				<a href={`/tabpage/${type}`} className="whitespace-wrap overflow-hidden rounded border border-cyan-400 border-solid flex sm:inline-flex flex-row justify-center items-center m-2 h-[15svh] sm:align-top sm:w-[150px] sm:h-full sm:m-0">
 					<p className="w-full text-center text-xl whitespace-normal">আরো {tabname} দেখুন </p>
 				</a>
 			</div>
@@ -158,7 +158,7 @@ function LoadTabs({type, catchPhrase, reverse}){
 function Page() { return (
     <>
 		<HeaderClient/>	
-		<div className="rounded-lg shadow-customBSBanner border border-slate-400 border-solid flex flex-col justify-center items-center mt-8 w-[95dvw] h-[50dvh] mx-auto text-center">
+		<div className="rounded-lg shadow-customBSBanner border border-slate-400 border-solid flex flex-col justify-center items-center mt-8 w-[95dvw] h-[50svh] mx-auto text-center">
 			<h3 className="text-4xl text-slate-400 drop-shadow-customBanner">অ্যানিমে দেখুন</h3>
 			<h3 className="text-5xl text-cyan-400 drop-shadow-customBannerSlate">বাংলায়</h3>
 			<h3 className="text-4xl text-slate-400 drop-shadow-customBanner">AniDubsBD তে</h3>

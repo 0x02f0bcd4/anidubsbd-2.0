@@ -60,7 +60,7 @@ export default async function Page(){
                                 watchlist.values.map((value)=>{
                                     let fullname = value.anime_name + (value.anime_season?" "+value.anime_season:"");
                                     return (
-                                        <a key={value.id} href={`/animeInfo?id=${value.id}`} className="border border-slate-400 rounded flex flex-row min-[550px]:flex-col min-[550px]:justify-between items-center p-1 my-2 h-[20dvh] min-[550px]:max-w-[150px] min-[550px]:h-[250px]">
+                                        <a key={value.id} href={`/animeInfo?id=${value.id}`} className="border border-slate-400 rounded flex flex-row min-[550px]:flex-col min-[550px]:justify-between items-center p-1 my-2 h-[20svh] min-[550px]:max-w-[150px] min-[550px]:h-[250px]">
                                             <img className="h-full pl-2 min-[550px]:pl-0 min-[550px]:max-w-full min-[550px]:max-h-[85%]" src={`/Posters/${fullname} Poster.jpg`} alt={`Poster of ${fullname}`}/>
                                             <p className="text-lg pl-2 whitespace-nowrap overflow-hidden text-ellipsis min-[550px]:w-[80%]">{fullname}</p>
                                         </a>

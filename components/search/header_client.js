@@ -35,7 +35,7 @@ export default function HeaderClient(){
 	return (
 		<>
 
-			<header className="static md:sticky z-40 flex flex-row items-center justify-between rounded top-2 mx-auto w-[98vw] h-[8dvh] short:h-[15dvh] bg-regal-blue">
+			<header className="static md:sticky z-40 flex flex-row items-center justify-between rounded top-2 mx-auto w-[98vw] h-[8svh] short:h-[15svh] bg-regal-blue">
 				<a href='/' className="flex flex-row justify-start w-[25%] md:w-[12%] h-full">
 					<Image src={Logo} alt='Logo' className="max-h-full object-contain aspect-[2/1]"/>
 				</a>
@@ -50,11 +50,11 @@ export default function HeaderClient(){
 				<Image onClick={handleHamburger} src={hamburger} alt="Hamburger menu" className="md:hidden max-h-full max-w-[10%] cursor-pointer pr-1"/>
 			</header>
 
-			<div style={showSearch?{display:'block'}:{display: 'none'}} className="md:hidden z-40 mx-auto top-[10dvh] w-[90dvw] h-[8dvh]">
+			<div style={showSearch?{display:'block'}:{display: 'none'}} className="md:hidden z-40 mx-auto top-[10svh] w-[90dvw] h-[8svh]">
 				<Search/>
 			</div>
 
-			<div style={showHamburger?{width:'300px'}:{width: '0%'}} className="absolute top-[10dvh] transition-[width] duration-700 rounded overflow-hidden bg-slate-900 flex flex-col items-center right-1 opacity-1 z-[75]">
+			<div style={showHamburger?{width:'300px'}:{width: '0%'}} className="absolute top-[10svh] transition-[width] duration-700 rounded overflow-hidden bg-slate-900 flex flex-col items-center right-1 opacity-1 z-[75]">
 				<a href="/tabpage/trending" className="whitespace-nowrap overflow-hidden p-2 text-lg">Watch Trending Anime</a>
 				<a href="/tabpage/bdub" className="whitespace-nowrap overflow-hidden p-2 text-lg">Watch Bangla Dubbed Anime</a>
 				<a href="/tabpage/bsub" className="whitespace-nowrap overflow-hidden p-2 text-lg">Watch Bangla Subbed Anime</a>
@@ -68,7 +68,7 @@ export default function HeaderClient(){
 
 
 /*
-			<div style={showHamburger?{height: 'auto'}:{height:'0'}} className="transform-gpu rounded transition-height duration-700 border boder-cyan-900 flex flex-col items-center bg-slate-400 md:hidden z-40 absolute mx-auto top-[10dvh] w-[90dvw]">
+			<div style={showHamburger?{height: 'auto'}:{height:'0'}} className="transform-gpu rounded transition-height duration-700 border boder-cyan-900 flex flex-col items-center bg-slate-400 md:hidden z-40 absolute mx-auto top-[10svh] w-[90dvw]">
 				<a href="/tabpage/trending" className="p-2 text-xl">Watch Trending anime</a>
 				<a href="/tabpage/bdub" className="p-2 text-xl">Watch Bangla dubbed</a>
 				<a href="/tabpage/bsub" className="p-2 text-xl">Watch Bangla subbed</a>
