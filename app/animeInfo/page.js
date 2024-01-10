@@ -131,7 +131,7 @@ async function AnimeInfo({searchParams}){
 
 
                         <h2 className="text-xl text-slate-900">{json.values.anime_studio}</h2>
-                        <h2 className="text-xl text-slate-900">{json.values.anime_localizing_studio}</h2>
+                        <h2 className="text-xl text-slate-900">Fan dubbed - {json.values.anime_localizing_studio}</h2>
 
                         <p className="p-2 text-slate-900">{json.values.anime_description}</p>
                     </div>
